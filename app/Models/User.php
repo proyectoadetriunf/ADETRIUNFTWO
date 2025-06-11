@@ -18,7 +18,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'rol_id',           // 👈 Usamos rol_id correctamente
+        'rol_id',           //  Usamos rol_id correctamente
         'empleado_id',
         'beneficiario_id'
     ];
