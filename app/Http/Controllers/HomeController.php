@@ -35,5 +35,12 @@ class HomeController extends Controller
             'proyectos'
         ));
     }
+    
+    public function mostrarMapa()
+{
+    $proyectos = DB::connection('mongodb')->collection('proyectos')->get(['nombre', 'lat', 'lng', 'departamento']);
+    return view('mapa', compact('proyectos'));
+}
+
 }
 

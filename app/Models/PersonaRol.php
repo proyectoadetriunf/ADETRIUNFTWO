@@ -3,15 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+
+use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
 class PersonaRol extends Model
 {
     use HasFactory;
 
-    protected $table = 'persona_roles'; // Asegúrate que este sea el nombre de tu tabla real
-    protected $primaryKey = 'id'; // Cambia si tu PK tiene otro nombre
-
+    protected $table = 'persona_roles'; 
+    protected $primaryKey = 'id'; 
     protected $fillable = [
         'persona_id',
         'rol_id',

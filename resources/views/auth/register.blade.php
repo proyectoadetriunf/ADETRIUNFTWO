@@ -1,6 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: linear-gradient(to bottom, #f39c12, #e74c3c, #e84393); /* Mismo degradado */
+        font-family: 'Segoe UI', sans-serif;
+    }
+</style>
+
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">

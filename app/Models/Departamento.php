@@ -11,4 +11,5 @@ class Departamento extends Model
     protected $table = 'departamentos';
     protected $primaryKey = 'departamento_id';
     public $timestamps = false;
+
 }

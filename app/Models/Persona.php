@@ -1,11 +1,14 @@
 <?php
-
 namespace App\Models;
 
-use Jenssegers\Mongodb\Eloquent\Model;
+use Jenssegers\Mongodb\Auth\User as Authenticatable;
 
-class Persona extends Model
+use Laravel\Sanctum\HasApiTokens;
+
+class Persona extends Authenticatable
 {
+    use HasApiTokens;
+
     protected $connection = 'mongodb';
     protected $collection = 'personas';
 
@@ -13,6 +16,7 @@ class Persona extends Model
         'nomb_per', 'dni', 'fecha_nacimiento', 'sexo',
         'telefono', 'correo', 'direccion',
         'departamento_id', 'municipio_id', 'colonia_id',
+        'email', 'password', 'rol_id',
     ];
 }
 

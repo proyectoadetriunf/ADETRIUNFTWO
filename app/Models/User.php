@@ -2,44 +2,41 @@
 
 namespace App\Models;
 
-use Jenssegers\Mongodb\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
-use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Eloquent implements AuthenticatableContract, JWTSubject
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use Authenticatable;
 
     protected $connection = 'mongodb';
+    protected $collection = 'users'; // Tu colección en MongoDB
 
     protected $fillable = [
         'name',
         'email',
         'password',
-        'rol_id',           //  Usamos rol_id correctamente
-        'empleado_id',
-        'beneficiario_id'
+        'rol_id',
+        'foto',
+
+        
     ];
 
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password'
     ];
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    // === JWT Required Methods ===
 
-    // Relaciones si las necesitas
-    public function empleado()
+    public function getJWTIdentifier()
     {
-        return $this->belongsTo(Empleado::class, 'empleado_id');
+        return $this->getKey(); // Usualmente es el _id
     }
 
-    public function beneficiario()
+    public function getJWTCustomClaims()
     {
-        return $this->belongsTo(Beneficiario::class, 'beneficiario_id');
+        return [];
     }
 }

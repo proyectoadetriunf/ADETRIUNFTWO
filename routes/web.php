@@ -10,6 +10,7 @@ use App\Http\Controllers\AvanceController;
 use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PerfilController;
 
 // ====================================
 // RUTA BASE Y AUTENTICACIÓN
@@ -23,56 +24,59 @@ Auth::routes();
 Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
 // ====================================
-// RUTA PRINCIPAL (SOLO ADMIN O TÉCNICO)
+// PANEL PRINCIPAL (SOLO LOGUEADOS CON ROL)
 // ====================================
 Route::middleware(['auth', 'adminOTecnicoOnly'])->get('/home', [HomeController::class, 'index'])->name('home');
 
-
 // ====================================
-// RUTAS SOLO PARA ADMINISTRADORES (rol_id = 1)
+// RUTAS PARA ADMIN Y TÉCNICOS
 // ====================================
 Route::middleware(['auth', 'adminOTecnicoOnly'])->group(function () {
-    // Gestión de usuarios
-    Route::get('/usuarios', [UserController::class, 'index']);
-    Route::post('/usuarios', [UserController::class, 'store']);
 
-    // Gestión de beneficiarios (ver listado)
+    // ========== USUARIOS ==========
+    Route::get('/users', [UserController::class, 'index']);
+    Route::post('/users', [UserController::class, 'store']);
+
+    // ========== BENEFICIARIOS ==========
     Route::get('/beneficiarios', [BeneficiarioController::class, 'index'])->name('beneficiarios.index');
-
-    // Proyectos
-    Route::get('/proyectos/create', [ProyectoController::class, 'create'])->name('proyectos.create');
-    Route::post('/proyectos/store', [ProyectoController::class, 'store'])->name('proyectos.store');
-
-    // Avances
-    Route::get('/avances/create', [AvanceController::class, 'create'])->name('avances.create');
-
-    // Documentos
-    Route::get('/documentos/upload', [DocumentoController::class, 'upload'])->name('documentos.upload');
-
-    // Solicitudes
-    Route::get('/solicitudes/create', [SolicitudController::class, 'create'])->name('solicitudes.create');
-});
-
-// ====================================
-// RUTAS QUE TAMBIÉN PUEDE VER EL TÉCNICO
-// ====================================
-Route::middleware(['auth', 'adminOTecnicoOnly'])->group(function () {
-    Route::get('/beneficiarios/create', [BeneficiarioController::class, 'create'])->name('beneficiarios.create');
     Route::post('/beneficiarios', [BeneficiarioController::class, 'store'])->name('beneficiarios.store');
     Route::get('/beneficiarios/{id}/edit', [BeneficiarioController::class, 'edit'])->name('beneficiarios.edit');
     Route::put('/beneficiarios/{id}', [BeneficiarioController::class, 'update'])->name('beneficiarios.update');
     Route::delete('/beneficiarios/{id}', [BeneficiarioController::class, 'destroy'])->name('beneficiarios.destroy');
+
+    // Select dependientes
+    Route::get('/api/municipios/{departamento_id}', [BeneficiarioController::class, 'obtenerMunicipios']);
+    Route::get('/api/colonias/{municipio_id}', [BeneficiarioController::class, 'obtenerColonias']);
+
+    // ========== PROYECTOS ==========
+    Route::get('/proyectos/create', [ProyectoController::class, 'create'])->name('proyectos.create');
+    Route::post('/proyectos/store', [ProyectoController::class, 'store'])->name('proyectos.store');
+
+    // ========== AVANCES ==========
+    Route::get('/avances/create', [AvanceController::class, 'create'])->name('avances.create');
+
+    // ========== DOCUMENTOS ==========
+    Route::get('/documentos/upload', [DocumentoController::class, 'upload'])->name('documentos.upload');
+
+    // ========== SOLICITUDES ==========
+    Route::get('/solicitudes/create', [SolicitudController::class, 'create'])->name('solicitudes.create');
 });
 
 // ====================================
-// AJAX: MUNICIPIOS Y COLONIAS
-// ====================================
-Route::get('/api/municipios/{departamento}', [BeneficiarioController::class, 'municipiosPorDepartamento']);
-Route::get('/api/colonias/{municipio}', [BeneficiarioController::class, 'coloniasPorMunicipio']);
-
-// ====================================
-// CALENDARIO (ACCESO GENERAL AUTENTICADO)
+// CALENDARIO (GENÉRICO PARA AUTENTICADOS)
 // ====================================
 Route::middleware('auth')->get('/calendario', function () {
     return view('pages.calendar');
 });
+
+Route::get('/mapa', [TuControlador::class, 'mostrarMapa'])->name('mapa');
+
+//mensajeria 
+Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+Route::post('/chat/mensaje', [ChatController::class, 'store'])->name('chat.store');
+Route::delete('/chat/mensaje/{id}', [ChatController::class, 'destroy'])->name('chat.destroy');
+
+
+// perfil
+Route::get('perfil/edit', [PerfilController::class, 'edit'])->name('perfil.edit');
+Route::post('perfil/update', [PerfilController::class, 'update'])->name('perfil.update');

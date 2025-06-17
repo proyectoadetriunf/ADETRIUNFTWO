@@ -14,14 +14,14 @@ return [
     ],
 
     'logo' => '<b>ADETRIUNF</b>',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+    'logo_img' => 'img/IMG_5253.PNG',
     'logo_img_class' => 'brand-image img-circle elevation-3',
-    'logo_img_alt' => 'Fundación Logo',
+    'logo_img_alt' => 'Logo ADETRIUNF',
 
     'auth_logo' => [
         'enabled' => false,
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            'path' => 'img/IMG_5253.PNG',
             'alt' => 'Auth Logo',
             'class' => '',
             'width' => 50,
@@ -33,7 +33,7 @@ return [
         'enabled' => true,
         'mode' => 'fullscreen',
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            'path' => 'img/IMG_5253.PNG',
             'alt' => 'AdminLTE Preloader Image',
             'effect' => 'animation__shake',
             'width' => 60,
@@ -51,7 +51,7 @@ return [
     'layout_topnav' => null,
     'layout_boxed' => null,
     'layout_fixed_sidebar' => true,
-    'layout_fixed_navbar' =>  true,
+    'layout_fixed_navbar' => true,
     'layout_fixed_footer' => null,
     'layout_dark_mode' => null,
 
@@ -86,60 +86,60 @@ return [
     'laravel_js_path' => 'js/app.js',
 
     'menu' => [
+
+        // 🔍 Buscador en barra lateral
         [
             'type' => 'sidebar-menu-search',
             'text' => 'Buscar...',
         ],
-       
+
+        // 📁 Gestión de Proyectos
         [
-    'text' => 'Gestionar proyectos',
-    'icon' => 'fas fa-folder-plus',
-    'submenu' => [
-        [
-            'text' => 'Registrar beneficiario',
-            'icon' => 'fas fa-user-plus',
-            'url'  => 'beneficiarios/create',
-            
+            'text' => 'Gestionar proyectos',
+            'icon' => 'fas fa-folder-plus',
+            'submenu' => [
+                [
+                    'text' => 'Registrar beneficiario',
+                    'icon' => 'fas fa-user-plus',
+                    'url'  => 'beneficiarios',
+                ],
+                [
+                    'text' => 'Registrar avance',
+                    'icon' => 'fas fa-tasks',
+                    'url'  => '#',
+                    'id'   => 'abrirModalAvance',
+                ],
+                [
+                    'text' => 'Subir documentación',
+                    'icon' => 'fas fa-upload',
+                    'url'  => '#',
+                    'id'   => 'abrirModalDocumentacion',
+                ],
+                [
+                    'text' => 'Crear solicitud',
+                    'icon' => 'fas fa-paper-plane',
+                    'url'  => '#',
+                    'id'   => 'abrirModalSolicitud',
+                ],
+            ],
         ],
+
+        // 📅 Calendario
         [
-            'text' => 'Registrar avance',
-            'icon' => 'fas fa-tasks',
-            'url'  => '#',
-            'id'   => 'abrirModalAvance',
-        ],
-        [
-            'text' => 'Subir documentación',
-            'icon' => 'fas fa-upload',
-            'url'  => '#',
-            'id'   => 'abrirModalDocumentacion',
-        ],
-        [
-            'text' => 'Crear solicitud',
-            'icon' => 'fas fa-paper-plane',
-            'url'  => '#',
-            'id'   => 'abrirModalSolicitud',
-        ],
-    ],
-],
- [
             'text' => 'Calendario',
             'icon' => 'fas fa-calendar-alt',
             'url'  => 'calendario',
         ],
 
-
-
-
-],
-
+        // 🔔 Notificaciones (topnav)
         [
-            'type'         => 'navbar-notification',
-            'id'           => 'notificaciones',
-            'icon'         => 'fas fa-bell',
-            'label'        => 3, 
-            'label_color'  => 'danger',
-            'url'          => '#',
-            'topnav_right' => true,
+            'type'            => 'navbar-notification',
+            'id'              => 'notificaciones',
+            'icon'            => 'fas fa-bell',
+            'label'           => 3,
+            'label_color'     => 'danger',
+            'url'             => '#',
+            'topnav_right'    => true,
             'dropdown_mode'   => true,
             'dropdown_flabel' => 'Ver todas las notificaciones',
             'dropdown_items'  => [
@@ -158,6 +158,32 @@ return [
             ],
         ],
 
+        // 👤 Perfil (topnav)
+        [
+            'type'         => 'navbar-item',
+            'text'         => '',
+            'icon'         => 'fas fa-user',
+            'url'          => 'perfil/edit',
+            'topnav_right' => true,
+        ],
+
+        // ⚙️ Configuración (topnav)
+        [
+            'type'         => 'navbar-item',
+            'text'         => '',
+            'icon'         => 'fas fa-cog',
+            'url'          => 'configuracion',
+            'topnav_right' => true,
+        ],
+
+        // 🔍 Buscador topnav
+        [
+            'type'         => 'navbar-search',
+            'text'         => 'Buscar...',
+            'topnav_right' => true,
+        ],
+    ],
+
     'filters' => [
         JeroenNoten\LaravelAdminLte\Menu\Filters\GateFilter::class,
         JeroenNoten\LaravelAdminLte\Menu\Filters\HrefFilter::class,
@@ -170,20 +196,21 @@ return [
 
     'plugins' => [
         'FullCalendar' => [
-        'active' => true,
-        'files' => [
-            [
-                'type' => 'js',
-                'asset' => false,
-                'location' => '//cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.js',
-            ],
-            [
-                'type' => 'css',
-                'asset' => false,
-                'location' => '//cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.css',
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.js',
+                ],
+                [
+                    'type' => 'css',
+                    'asset' => false,
+                    'location' => '//cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.css',
+                ],
             ],
         ],
-    ],],
+    ],
 
     'iframe' => [
         'default_tab' => [
@@ -206,4 +233,5 @@ return [
     ],
 
     'livewire' => false,
+
 ];

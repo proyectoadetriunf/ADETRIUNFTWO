@@ -1,40 +1,36 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Persona;
 
-class TokenAuthController extends Controller
+class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        // Buscar por correo en MongoDB
         $user = Persona::where('email', $request->email)->first();
 
-        // Validar existencia y contraseña
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Credenciales incorrectas'], 401);
         }
 
-        // Validar rol permitido
+        // Solo permitir admin, coordinador y técnico
         if (!in_array($user->rol_id, [1, 2, 3])) {
             return response()->json(['message' => 'Acceso denegado para este rol'], 403);
         }
 
-        // Eliminar tokens anteriores si solo querés uno por usuario
+        // Opcional: eliminar tokens anteriores para evitar duplicados
         $user->tokens()->delete();
 
-        // Crear token nuevo
-        $token = $user->createToken('login-token')->plainTextToken;
+        $token = $user->createToken('web-token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Login exitoso',
-            'token' => $token,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
             'user' => [
-                'nombres' => $user->nombres,
+                'nombre' => $user->nomb_per ?? '',
                 'email' => $user->email,
                 'rol_id' => $user->rol_id
             ]

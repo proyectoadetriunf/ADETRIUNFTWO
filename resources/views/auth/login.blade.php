@@ -1,38 +1,88 @@
-<!-- resources/views/auth/login.blade.php -->
-
 @extends('layouts.app')
 
 @section('content')
 <style>
     body {
-        background: url('/images/fondo_institucional.jpg') no-repeat center center fixed;
-        background-size: cover;
+        margin: 0;
+        min-height: 100vh;
+        background: linear-gradient(to bottom, #f39c12, #e74c3c, #e84393);
         font-family: 'Segoe UI', sans-serif;
     }
-    .login-container {
-        height: 100vh;
+
+    .topbar {
+        background-color: white;
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .topbar .brand {
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .topbar .links a {
+        margin-left: 15px;
+        color: #333;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .login-wrapper {
         display: flex;
         justify-content: center;
         align-items: center;
-        backdrop-filter: blur(6px);
+        min-height: calc(100vh - 70px); /* Resta la altura de la barra superior */
+        padding-top: 30px;
     }
+
     .login-card {
-        background-color: rgba(255, 255, 255, 0.95);
-        border-radius: 15px;
+        background: white;
         padding: 30px;
-        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
-        width: 380px;
-        animation: fadeIn 1s ease;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        max-width: 400px;
     }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
+
+    .login-card h3 {
+        font-weight: bold;
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .btn-primary {
+        width: 100%;
+        border-radius: 8px;
+        font-weight: bold;
+    }
+
+    .form-check-label {
+        font-size: 14px;
+    }
+
+    .text-link {
+        display: block;
+        margin-top: 10px;
+        text-align: center;
+        font-size: 14px;
     }
 </style>
 
-<div class="login-container">
+
+
+<!--  Login Form -->
+<div class="login-wrapper">
     <div class="login-card">
-        <h3 class="text-center mb-4 text-primary">Bienvenido a ADETRIUNF</h3>
+        <h3>Bienvenido a <span class="text-primary">ADETRIUNF</span></h3>
 
         @if(session('error'))
             <div class="alert alert-danger">{{ session('error') }}</div>
@@ -41,27 +91,22 @@
         <form method="POST" action="{{ route('login') }}">
             @csrf
 
-            <div class="mb-3">
-                <label for="email" class="form-label">Correo electrónico</label>
-                <input id="email" type="email" class="form-control" name="email" required autofocus>
-            </div>
+            <label for="email">Correo electrónico</label>
+            <input id="email" type="email" name="email" class="form-control" placeholder="Ingresa tu correo" required>
 
-            <div class="mb-3">
-                <label for="password" class="form-label">Contraseña</label>
-                <input id="password" type="password" class="form-control" name="password" required>
-            </div>
+            <label for="password">Contraseña</label>
+            <input id="password" type="password" name="password" class="form-control" placeholder="Ingresa tu contraseña" required>
 
-            <div class="mb-3 form-check">
-                <input class="form-check-input" type="checkbox" name="remember" id="remember">
+            <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" name="remember" id="remember">
                 <label class="form-check-label" for="remember">Recuérdame</label>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">Iniciar sesión</button>
+            <button type="submit" class="btn btn-primary">Iniciar sesión</button>
 
-            <div class="mt-3 text-center">
-                <a href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a>
-            </div>
+            <a class="text-link" href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a>
         </form>
     </div>
 </div>
 @endsection
+
