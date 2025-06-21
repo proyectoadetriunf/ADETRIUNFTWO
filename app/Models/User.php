@@ -19,13 +19,18 @@ class User extends Eloquent implements AuthenticatableContract, JWTSubject
         'email',
         'password',
         'rol_id',
-        'foto',
+        'photo',
+        'is_active',
 
         
     ];
 
     protected $hidden = [
         'password'
+    ];
+
+    protected $casts = [
+    'is_active' => 'boolean',
     ];
 
     // === JWT Required Methods ===
