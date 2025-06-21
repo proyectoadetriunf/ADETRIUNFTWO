@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use Jenssegers\Mongodb\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Eloquent implements AuthenticatableContract, JWTSubject
 {
