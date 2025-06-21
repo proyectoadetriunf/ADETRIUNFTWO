@@ -7,10 +7,11 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Eloquent implements AuthenticatableContract, JWTSubject
+class User extends Authenticatable implements JWTSubject
 {
-    use Authenticatable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     protected $connection = 'mongodb';
     protected $collection = 'users'; // Tu colección en MongoDB
@@ -22,8 +23,6 @@ class User extends Eloquent implements AuthenticatableContract, JWTSubject
         'rol_id',
         'photo',
         'is_active',
-
-        
     ];
 
     protected $hidden = [
@@ -31,7 +30,7 @@ class User extends Eloquent implements AuthenticatableContract, JWTSubject
     ];
 
     protected $casts = [
-    'is_active' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     // === JWT Required Methods ===

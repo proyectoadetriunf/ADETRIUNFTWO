@@ -131,6 +131,70 @@ return [
             'url'  => 'calendario',
         ],
 
+
+
+                // 🧑‍💼 Administración
+        [
+            'text' => 'Administración',
+            'icon' => 'fas fa-user-cog',
+            'submenu' => [
+                [
+                    'text' => 'Usuarios',
+                    'icon' => 'fas fa-users',
+                    'url'  => 'admin/usuarios',
+                ],
+                [
+                    'text' => 'Roles y Permisos',
+                    'icon' => 'fas fa-user-shield',
+                    'url'  => 'admin/roles',
+                ],
+            ],
+        ],
+
+        // 📊 Reportes
+        [
+            'text' => 'Reportes',
+            'icon' => 'fas fa-chart-line',
+            'submenu' => [
+                [
+                    'text' => 'Avances por Proyecto',
+                    'icon' => 'fas fa-project-diagram',
+                    'url'  => 'admin/reportes/avances',
+                ],
+                [
+                    'text' => 'Financieros',
+                    'icon' => 'fas fa-dollar-sign',
+                    'url'  => 'admin/reportes/financieros',
+                ],
+                [
+                    'text' => 'Inversión por Comunidad',
+                    'icon' => 'fas fa-map-marked-alt',
+                    'url'  => 'admin/reportes/comunidades',
+                ],
+            ],
+        ],
+
+        // 📅 Gestión de Citas
+        [
+            'text' => 'Citas Programadas',
+            'icon' => 'fas fa-calendar-check',
+            'url'  => 'admin/citas',
+        ],
+
+        // 🏘️ Comunidades
+        [
+            'text' => 'Comunidades',
+            'icon' => 'fas fa-map',
+            'url'  => 'admin/comunidades',
+        ],
+
+        // ⚙️ Parámetros del Sistema
+        [
+            'text' => 'Configuraciones',
+            'icon' => 'fas fa-sliders-h',
+            'url'  => 'admin/configuraciones',
+        ],
+
         // 🔔 Notificaciones (topnav)
         [
             'type'            => 'navbar-notification',
@@ -158,6 +222,8 @@ return [
             ],
         ],
 
+
+       
         // 👤 Perfil (topnav)
         [
             'type'         => 'navbar-item',
@@ -182,6 +248,9 @@ return [
             'text'         => 'Buscar...',
             'topnav_right' => true,
         ],
+
+
+        
     ],
 
     'filters' => [
