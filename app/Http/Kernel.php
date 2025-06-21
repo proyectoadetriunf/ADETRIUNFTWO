@@ -71,6 +71,8 @@ class Kernel extends HttpKernel
       'jwt.auth' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
 
         'adminOTecnicoOnly' => \App\Http\Middleware\AdminOTecnicoOnly::class,
+        'adminonly' => \App\Http\Middleware\AdminOnly::class,
+
 
 
 

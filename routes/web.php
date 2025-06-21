@@ -12,6 +12,9 @@ use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PerfilController;
 
+use App\Http\Controllers\Admin\UsuarioController;
+
+Route::resource('usuarios', UsuarioController::class)->names('usuarios');
 // ====================================
 // RUTA BASE Y AUTENTICACIÓN
 // ====================================
@@ -80,3 +83,37 @@ Route::delete('/chat/mensaje/{id}', [ChatController::class, 'destroy'])->name('c
 // perfil
 Route::get('perfil/edit', [PerfilController::class, 'edit'])->name('perfil.edit');
 Route::post('perfil/update', [PerfilController::class, 'update'])->name('perfil.update');
+
+
+// ====================================
+// RUTAS SOLO PARA ADMINISTRADOR
+// ====================================
+Route::middleware(['auth', 'adminonly'])->prefix('admin')->group(function () {
+
+    // 👥 Gestión de Usuarios
+    Route::get('/usuarios', [App\Http\Controllers\Admin\UsuarioController::class, 'index'])->name('admin.usuarios');
+
+    // 🔐 Roles y permisos
+    Route::get('/roles', [App\Http\Controllers\Admin\RolController::class, 'index'])->name('admin.roles');
+
+    // 📊 Reportes
+    Route::get('/reportes/avances', [App\Http\Controllers\Admin\ReporteController::class, 'avances'])->name('admin.reportes.avances');
+    Route::get('/reportes/financieros', [App\Http\Controllers\Admin\ReporteController::class, 'financieros'])->name('admin.reportes.financieros');
+    Route::get('/reportes/comunidades', [App\Http\Controllers\Admin\ReporteController::class, 'comunidades'])->name('admin.reportes.comunidades');
+
+    // 📅 Citas
+    Route::get('/citas', [App\Http\Controllers\Admin\CitaController::class, 'index'])->name('admin.citas');
+
+    // 🏘️ Comunidades
+    Route::get('/comunidades', [App\Http\Controllers\Admin\ComunidadController::class, 'index'])->name('admin.comunidades');
+
+    // ⚙️ Configuración del sistema
+    
+    Route::get('/configuraciones', [App\Http\Controllers\Admin\ConfigController::class, 'index'])->name('admin.configuraciones');
+
+    //rutas roles
+    Route::get('/roles', [App\Http\Controllers\Admin\RolController::class, 'index'])->name('admin.roles');
+    Route::post('/roles/asignar', [App\Http\Controllers\Admin\RolController::class, 'asignar'])->name('admin.roles.asignar');
+
+});
+
