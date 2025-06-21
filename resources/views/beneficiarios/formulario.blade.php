@@ -163,12 +163,14 @@
                                     <a href="{{ asset('storage/' . $b['archivo_identidad']) }}" target="_blank" class="btn btn-sm btn-secondary mb-1">Ver identidad</a>
                                 @endif
                                 <a href="#" class="btn btn-sm btn-info">Ver</a>
-                                <a href="#" class="btn btn-sm btn-warning">Editar</a>
-                                <form method="POST" action="#" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este beneficiario?')">Eliminar</button>
-                                </form>
+                                <a href="{{ route('beneficiarios.edit', $b['_id']) }}" class="btn btn-sm btn-warning">Editar</a>
+                                <form action="{{ route('beneficiarios.destroy', $b['_id']) }}" method="POST" style="display:inline-block;">
+                                         @csrf
+                                        @method('DELETE')
+                                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este beneficiario?')">
+                                                <i class="fas fa-trash"></i>
+                                                </button>
+                                 </form>
                             </td>
                         </tr>
                     @empty

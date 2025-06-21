@@ -47,6 +47,7 @@ class BeneficiarioController extends Controller
                 : null;
 
             return [
+                '_id' => (string) $b['_id'],
                 'nomb_per' => $persona['nombres'] ?? '',
                 'dni' => $persona['dni'] ?? '',
                 'telefono' => $persona['telefono'] ?? '',
@@ -148,4 +149,66 @@ public function obtenerColonias($municipio_id)
 
     return response()->json($colonias);
 }
+public function destroy($id)
+{
+    $deleted = DB::connection('mongodb')
+        ->collection('beneficiarios')
+        ->where('_id', new \MongoDB\BSON\ObjectId($id))
+        ->delete();
+
+    if ($deleted) {
+        return redirect()->route('beneficiarios.index')->with('success', 'Beneficiario eliminado.');
+    }
+
+    return redirect()->route('beneficiarios.index')->with('error', 'No se encontró el beneficiario.');
+}
+
+// Mostrar formulario para editar
+public function edit($id)
+{
+    $beneficiario = DB::connection('mongodb')->collection('beneficiarios')->find($id);
+
+    if (!$beneficiario) {
+        return redirect()->route('beneficiarios.index')->with('error', 'Beneficiario no encontrado.');
+    }
+
+    $persona = DB::connection('mongodb')->collection('personas')->find($beneficiario['persona_id']);
+    $departamentos = DB::connection('mongodb')->collection('departamentos')->get();
+    $municipios = DB::connection('mongodb')->collection('municipios')->get();
+    $colonias = DB::connection('mongodb')->collection('colonias')->get();
+
+    return view('beneficiarios.editar', compact('beneficiario', 'persona', 'departamentos', 'municipios', 'colonias'));
+}
+
+// Actualizar beneficiario
+public function update(Request $request, $id)
+{
+    $beneficiario = DB::connection('mongodb')->collection('beneficiarios')->find($id);
+
+    if (!$beneficiario) {
+        return redirect()->route('beneficiarios.index')->with('error', 'Beneficiario no encontrado.');
+    }
+
+    $persona_id = $beneficiario['persona_id'];
+
+    DB::connection('mongodb')->collection('personas')->where('_id', $persona_id)->update([
+        'nombres' => ucwords($request->nomb_per),
+        'dni' => $request->dni,
+        'fecha_nacimiento' => $request->fecha_nacimiento,
+        'sexo' => $request->sexo,
+        'telefono' => $request->telefono,
+        'correo' => $request->correo,
+        'direccion' => $request->direccion,
+    ]);
+
+    DB::connection('mongodb')->collection('beneficiarios')->where('_id', $id)->update([
+        'departamento_id' => $request->departamento_id,
+        'municipio_id' => $request->municipio_id,
+        'colonia_id' => $request->colonia_id,
+    ]);
+
+    return redirect()->route('beneficiarios.index')->with('success', 'Beneficiario actualizado correctamente.');
+}
+
+
 }
