@@ -91,102 +91,102 @@ return [
         [
             'type' => 'sidebar-menu-search',
             'text' => 'Buscar...',
-        ],
+            ],
 
-        // 📁 Gestión de Proyectos
-        [
-            'text' => 'Gestionar proyectos',
-            'icon' => 'fas fa-folder-plus',
-            'submenu' => [
-                [
-                    'text' => 'Registrar beneficiario',
-                    'icon' => 'fas fa-user-plus',
-                    'url'  => 'beneficiarios',
-                ],
-                [
-                    'text' => 'Registrar avance',
-                    'icon' => 'fas fa-tasks',
-                    'url'  => '#',
-                    'id'   => 'abrirModalAvance',
-                ],
-                [
-                    'text' => 'Subir documentación',
-                    'icon' => 'fas fa-upload',
-                    'url'  => '#',
-                    'id'   => 'abrirModalDocumentacion',
-                ],
-                [
-                    'text' => 'Crear solicitud',
-                    'icon' => 'fas fa-paper-plane',
-                    'url'  => '#',
-                    'id'   => 'abrirModalSolicitud',
+            // 📁 Gestión de Proyectos
+            [
+                'text' => 'Gestionar proyectos',
+                'icon' => 'fas fa-folder-plus',
+                'submenu' => [
+                    [
+                        'text' => 'Registrar beneficiario',
+                        'icon' => 'fas fa-user-plus',
+                        'url'  => 'beneficiarios',
+                    ],
+                    [
+                        'text' => 'Registrar avance',
+                        'icon' => 'fas fa-tasks',
+                        'url'  => '#',
+                        'id'   => 'abrirModalAvance',
+                    ],
+                    [
+                        'text' => 'Subir documentación',
+                        'icon' => 'fas fa-upload',
+                        'url'  => '#',
+                        'id'   => 'abrirModalDocumentacion',
+                    ],
+                    [
+                        'text' => 'Crear solicitud',
+                        'icon' => 'fas fa-paper-plane',
+                        'url'  => '#',
+                        'id'   => 'abrirModalSolicitud',
+                    ],
                 ],
             ],
-        ],
 
-        // 📅 Calendario
-        [
-            'text' => 'Calendario',
-            'icon' => 'fas fa-calendar-alt',
-            'url'  => 'calendario',
-        ],
-
+            // 📅 Calendario
+            [
+                'text' => 'Calendario',
+                'icon' => 'fas fa-calendar-alt',
+                'url'  => 'calendario',
+            ],
 
 
-                // 🧑‍💼 Administración
-        [
-            'text' => 'Administración',
-            'icon' => 'fas fa-user-cog',
-            'submenu' => [
-                [
-                    'text' => 'Usuarios',
-                    'icon' => 'fas fa-users',
-                    'url'  => 'admin/usuarios',
-                ],
-                [
-                    'text' => 'Roles y Permisos',
-                    'icon' => 'fas fa-user-shield',
-                    'url'  => 'admin/roles',
+
+                    // 🧑‍💼 Administración
+            [
+                'text' => 'Administración',
+                'icon' => 'fas fa-user-cog',
+                'submenu' => [
+                    [
+                        'text' => 'Usuarios',
+                        'icon' => 'fas fa-users',
+                        'url'  => 'admin/usuarios',
+                    ],
+                    [
+                        'text' => 'Roles y Permisos',
+                        'icon' => 'fas fa-user-shield',
+                        'url'  => 'admin/roles',
+                    ],
                 ],
             ],
-        ],
 
-        // 📊 Reportes
-        [
-            'text' => 'Reportes',
-            'icon' => 'fas fa-chart-line',
-            'submenu' => [
-                [
-                    'text' => 'Avances por Proyecto',
-                    'icon' => 'fas fa-project-diagram',
-                    'url'  => 'admin/reportes/avances',
-                ],
-                [
-                    'text' => 'Financieros',
-                    'icon' => 'fas fa-dollar-sign',
-                    'url'  => 'admin/reportes/financieros',
-                ],
-                [
-                    'text' => 'Inversión por Comunidad',
-                    'icon' => 'fas fa-map-marked-alt',
-                    'url'  => 'admin/reportes/comunidades',
+            // 📊 Reportes
+            [
+                'text' => 'Reportes',
+                'icon' => 'fas fa-chart-line',
+                'submenu' => [
+                    [
+                        'text' => 'Avances por Proyecto',
+                        'icon' => 'fas fa-project-diagram',
+                        'url'  => 'admin/reportes/avances',
+                    ],
+                    [
+                        'text' => 'Financieros',
+                        'icon' => 'fas fa-dollar-sign',
+                        'url'  => 'admin/reportes/financieros',
+                    ],
+                    [
+                        'text' => 'Inversión por Comunidad',
+                        'icon' => 'fas fa-map-marked-alt',
+                        'url'  => 'admin/reportes/comunidades',
+                    ],
                 ],
             ],
-        ],
 
-        // 📅 Gestión de Citas
-        [
-            'text' => 'Citas Programadas',
-            'icon' => 'fas fa-calendar-check',
-            'url'  => 'admin/citas',
-        ],
+            // 📅 Gestión de Citas
+            [
+                'text' => 'Citas Programadas',
+                'icon' => 'fas fa-calendar-check',
+                'url'  => 'admin/citas',
+            ],
 
-        // 🏘️ Comunidades
-        [
-            'text' => 'Comunidades',
-            'icon' => 'fas fa-map',
-            'url'  => 'admin/comunidades',
-        ],
+            // 🏘️ Comunidades
+            [
+                'text' => 'Comunidades',
+                'icon' => 'fas fa-map',
+                'url'  => 'admin/comunidades',
+            ],
 
         // ⚙️ Parámetros del Sistema
         [
@@ -194,6 +194,41 @@ return [
             'icon' => 'fas fa-sliders-h',
             'url'  => 'admin/configuraciones',
         ],
+
+        /********************************* GESTOR DE PROYECTOS***************************************/
+        [
+    'text' => '👷 Técnico/Gestor de Proyecto',
+    'icon' => 'fas fa-user-cog',
+    'submenu' => [
+        [
+            'text' => '🗂️ Gestión de Proyectos',
+            'url'  => 'gestor/proyectos',
+        ],
+        [
+            'text' => '📋 Actividades / Tareas',
+            'url'  => 'gestor/tareas',
+        ],
+        [
+            'text' => '📅 Citas Programadas',
+            'url'  => 'gestor/citas',
+        ],
+        [
+            'text' => '👥 Beneficiarios',
+            'url'  => 'gestor/beneficiarios',
+        ],
+        [
+            'text' => '📂 Evidencias y Documentos',
+            'url'  => 'gestor/documentos',
+        ],
+       
+        [
+            'text' => '📊 Resumen General',
+            'url'  => 'gestor/dashboard',
+        ],
+    ],
+],
+
+        /***************************************************************************************** */
 
         // 🔔 Notificaciones (topnav)
         [
