@@ -143,4 +143,5 @@ Route::middleware(['auth', 'adminonly'])->prefix('admin')->group(function () {
     Route::get('/usuarios',          [UsuarioController::class, 'index' ])->name('admin.usuarios');
 
     Route::get('/roles',             [RolController::class, 'index'     ])->name('admin.roles');
-    Route::post('/roles/asignar',    [RolController::class, 'asign
+  Route::post('/roles/asignar', [App\Http\Controllers\Admin\RolController::class, 'asignar'])->name('admin.roles.asignar');
+
