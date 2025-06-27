@@ -1,11 +1,7 @@
 {
     "name": "laravel/laravel",
-    "repositories": [
-    {
-        "type": "vcs",
-        "url": "https://github.com/Mostafazke/spatie-permission-mongodb"
-    }
-    ],
+
+
     "type": "project",
     "description": "The Laravel Framework.",
     "keywords": ["framework", "laravel"],
