@@ -1,11 +1,10 @@
 {
     "name": "laravel/laravel",
-
-
     "type": "project",
     "description": "The Laravel Framework.",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
+
     "require": {
         "php": "^8.0.2",
         "guzzlehttp/guzzle": "^7.2",
@@ -15,8 +14,10 @@
         "laravel/sanctum": "*",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^4.6",
-        "spatie/laravel-permission": "^6.19"
+        "spatie/laravel-permission": "^6.19",
+        "tymon/jwt-auth": "^2.2"
     },
+
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
@@ -26,6 +27,7 @@
         "phpunit/phpunit": "^9.5.10",
         "spatie/laravel-ignition": "^1.0"
     },
+
     "autoload": {
         "psr-4": {
             "App\\": "app/",
@@ -33,15 +35,18 @@
             "Database\\Seeders\\": "database/seeders/"
         }
     },
+
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
         }
     },
+
     "scripts": {
         "post-autoload-dump": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi || true"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
@@ -53,11 +58,13 @@
             "@php artisan key:generate --ansi"
         ]
     },
+
     "extra": {
         "laravel": {
             "dont-discover": []
         }
     },
+
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
@@ -66,7 +73,7 @@
             "pestphp/pest-plugin": true
         }
     },
+
     "minimum-stability": "dev",
     "prefer-stable": true
-
 }
