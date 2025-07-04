@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AdminLTE Laravel</title>
 
-  <!-- AdminLTE -->
+  <!-- Font Awesome (necesario para que se vean los íconos) -->
   <link rel="stylesheet" href="{{ asset('adminlte/plugins/fontawesome-free/css/all.min.css') }}">
+  
+  <!-- AdminLTE -->
   <link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
 </head>
 <body class="hold-transition sidebar-mini">
@@ -14,9 +16,43 @@
 
   <!-- Navbar -->
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <!-- IZQUIERDA -->
     <ul class="navbar-nav">
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
+      </li>
+    </ul>
+
+    <!-- DERECHA -->
+    <ul class="navbar-nav ml-auto">
+      <!-- Notificaciones -->
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="far fa-bell"></i>
+          <span class="badge badge-warning navbar-badge">3</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-item dropdown-header">3 Notificaciones</span>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-envelope mr-2"></i> 1 mensaje nuevo
+            <span class="float-right text-muted text-sm">3 min</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-users mr-2"></i> 2 nuevas solicitudes
+            <span class="float-right text-muted text-sm">12 horas</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item dropdown-footer">Ver todas las notificaciones</a>
+        </div>
+      </li>
+
+      <!-- Configuración -->
+      <li class="nav-item">
+        <a class="nav-link" href="#">
+          <i class="fas fa-cog"></i>
+        </a>
       </li>
     </ul>
   </nav>

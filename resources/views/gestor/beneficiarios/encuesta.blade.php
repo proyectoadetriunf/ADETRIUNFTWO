@@ -1,8 +1,8 @@
-@extends('adminlte::page')
+    @extends('adminlte::page')
 
-@section('title', 'Encuesta del Beneficiario')
+    @section('title', 'Encuesta del Beneficiario')
 
-@section('content')
+    @section('content')
 <div class="container mt-4">
     <h1>📝 Encuesta Personalizada</h1>
 

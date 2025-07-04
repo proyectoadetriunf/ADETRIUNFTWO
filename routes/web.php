@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BeneficiarioController;
 use App\Http\Controllers\AvanceController;
@@ -12,6 +11,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PerfilController;
 
 use App\Http\Controllers\Admin\UsuarioController;
+use App\Http\Controllers\Admin\RolController;
+
 
 Route::resource('usuarios', UsuarioController::class)->names('usuarios');
 
@@ -27,11 +28,40 @@ Route::prefix('gestor/proyectos')->group(function () {
     Route::post('/{id}/seguimiento', [GestorProyectoController::class, 'agregarSeguimiento'])->name('gestor.proyectos.agregarSeguimiento');
     Route::get('/seguimiento/{id}', [GestorProyectoController::class, 'verSeguimientos'])->name('gestor.proyectos.verSeguimientos');
     Route::post('/evidencias/guardar', [GestorProyectoController::class, 'guardarEvidencia'])->name('gestor.proyectos.evidencias.guardar');
+   
 });
+
+ Route::prefix('gestor')->middleware('gestor')->group(function () {
+    Route::get('/comuni', [App\Http\Controllers\gestor\ComuniController::class, 'index'])->name('gestor.comuni');
+});
+
+Route::post('/asignar', [App\Http\Controllers\ProyectoController::class, 'asignar'])->name('gestor.proyectos.asignar');
+
+use App\Http\Controllers\Gestor\ProyectoController;
+
+
+Route::prefix('gestor/proyectos')->name('gestor.proyectos.')->group(function() {
+    Route::get('/', [ProyectoController::class, 'index'])->name('index');
+    Route::post('/store', [ProyectoController::class, 'store'])->name('store');
+    Route::post('/asignar', [ProyectoController::class, 'asignar'])->name('asignar');
+    Route::post('/evidencias/guardar', [ProyectoController::class, 'guardarEvidencia'])->name('evidencias.guardar');
+});
+
+
 
 /***********************************************************************/
 
+/**********************************Salon******************************** */
+// Rutas de gestión del salón
+Route::prefix('gestor/salon')->middleware(['auth'])->group(function () {
+    Route::get('/', [App\Http\Controllers\SalonController::class, 'index'])->name('gestor.salon.index');
+    Route::post('/guardar', [App\Http\Controllers\SalonController::class, 'guardar'])->name('gestor.salon.guardar');
+});
 
+
+
+
+/*********************************************************************** */
 /**********************************tareas***********************************************/
 
 use App\Http\Controllers\Gestor\TareaController;
@@ -49,13 +79,14 @@ Route::prefix('gestor/tareas')->group(function () {
 /***************************************************************************************/
 
 /**********************************citas********************************************** */
+use App\Http\Controllers\CitasController;
 
-use App\Http\Controllers\Gestor\CitasController;
-
-Route::prefix('gestor/citas')->group(function () {
+Route::prefix('gestor/citas')->middleware(['auth'])->group(function () {
     Route::get('/', [CitasController::class, 'index'])->name('gestor.citas.index');
     Route::post('/guardar', [CitasController::class, 'guardar'])->name('gestor.citas.guardar');
 });
+
+    
 
 /*********************************beneficiarios******************************************** */
 
@@ -164,11 +195,22 @@ Route::post('perfil/update', [PerfilController::class, 'update'])->name('perfil.
 Route::middleware(['auth', 'adminonly'])->prefix('admin')->group(function () {
 
     // 👥 Gestión de Usuarios
-    Route::get('/usuarios', [App\Http\Controllers\Admin\UsuarioController::class, 'index'])->name('admin.usuarios');
+    Route::resource('usuarios', App\Http\Controllers\Admin\UsuarioController::class)->names('usuarios');
+    Route::delete('/admin/usuarios/{id}', [UsuarioController::class, 'destroy'])->name('usuarios.destroy');
 
-    // 🔐 Roles y permisos
-    Route::get('/roles', [App\Http\Controllers\Admin\RolController::class, 'index'])->name('admin.roles');
-    Route::post('/roles/asignar', [App\Http\Controllers\Admin\RolController::class, 'asignar'])->name('admin.roles.asignar');
+    
+
+
+    // 🔐 CRUD de Roles
+
+Route::get('/roles', [RolController::class, 'index'])->name('admin.roles');
+Route::get('/roles/create', [RolController::class, 'create'])->name('admin.roles.create');
+Route::post('/roles/store', [RolController::class, 'store'])->name('admin.roles.store');
+Route::get('/roles/{id}/edit', [RolController::class, 'edit'])->name('admin.roles.edit');
+Route::put('/roles/{id}', [RolController::class, 'update'])->name('admin.roles.update');
+Route::delete('/roles/{id}', [RolController::class, 'destroy'])->name('admin.roles.destroy');
+Route::post('/roles/asignar', [RolController::class, 'asignar'])->name('admin.roles.asignar');
+
 
     // 📊 Reportes
     Route::get('/reportes/avances', [App\Http\Controllers\Admin\ReporteController::class, 'avances'])->name('admin.reportes.avances');
@@ -183,4 +225,15 @@ Route::middleware(['auth', 'adminonly'])->prefix('admin')->group(function () {
 
     // ⚙️ Configuración del sistema
     Route::get('/configuraciones', [App\Http\Controllers\Admin\ConfigController::class, 'index'])->name('admin.configuraciones');
+    Route::post('/configuraciones/guardar', [App\Http\Controllers\Admin\ConfigController::class, 'guardarConfiguraciones'])->name('admin.configuraciones.guardar');
 });
+
+// ====================================
+// RUTA PÚBLICA PARA MANTENIMIENTO
+// ====================================
+Route::get('/mantenimiento', function () {
+    return view('mantenimiento');
+})->name('mantenimiento');
+
+
+
