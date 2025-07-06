@@ -28,11 +28,7 @@ class HomeController extends Controller
         $totalSolicitudesPendientes = Solicitud::where('estado', 'pendiente')->count();
         $proyectosSQL = Proyecto::orderBy('created_at', 'desc')->take(5)->get();
 
-
-        // 🔹 Datos desde MongoDB (como en ComuniController)
-
         // 🔹 Datos desde MongoDB
-
         $beneficiarios = DB::connection('mongodb')
             ->collection('beneficiarios')
             ->count();
@@ -52,14 +48,9 @@ class HomeController extends Controller
                 $totalAvance += $s['avance'] ?? 0;
             }
 
-
-            $proyecto['lat'] = $proyecto['lat'] ?? fake()->randomFloat(6, 13.095, 13.105);
-            $proyecto['lng'] = $proyecto['lng'] ?? fake()->randomFloat(6, -87.030, -87.020);
-
-            // Coordenadas fijas por defecto si no existen
+            // Coordenadas por defecto si no existen
             $proyecto['lat'] = $proyecto['lat'] ?? 13.1006;
             $proyecto['lng'] = $proyecto['lng'] ?? -87.025;
-
             $proyecto['avance_total'] = $totalAvance;
 
             return $proyecto;
@@ -69,7 +60,7 @@ class HomeController extends Controller
             return !empty($proyecto['nombre']);
         })->count();
 
-        // 🔹 Enviar todo a la vista
+        // 🔹 Enviar a la vista
         return view('home', compact(
             'totalProyectos',
             'totalBeneficiarios',
@@ -80,7 +71,4 @@ class HomeController extends Controller
             'proyectosActivos'
         ));
     }
-
-}
-
 }
