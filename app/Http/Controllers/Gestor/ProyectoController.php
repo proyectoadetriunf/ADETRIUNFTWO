@@ -11,8 +11,8 @@ class ProyectoController extends Controller
 {
     public function index(Request $request)
     {
-        // Traer todos los proyectos
         $proyectosRaw = DB::connection('mongodb')->collection('proyectos')->get();
+
         $proyectos = $proyectosRaw->map(function ($item) {
             return [
                 '_id'           => (string) ($item['_id'] ?? ''),
@@ -25,13 +25,12 @@ class ProyectoController extends Controller
             ];
         });
 
-        // Moderadores
         $moderadoresRaw = DB::connection('mongodb')
             ->collection('users')
             ->where('rol_id', 'moderador')
             ->get();
 
-        $moderadores = collect($moderadoresRaw)->map(function($mod){
+        $moderadores = collect($moderadoresRaw)->map(function ($mod) {
             return [
                 '_id'   => (string) $mod['_id'],
                 'name'  => $mod['name'] ?? '',
@@ -39,12 +38,9 @@ class ProyectoController extends Controller
             ];
         });
 
-        // Asignaciones
         $asignacionesRaw = DB::connection('mongodb')->collection('asignaciones')->get();
 
-        $proyectosAsignadosIds = $asignacionesRaw->pluck('proyecto_id')->map(function($id){
-            return (string) $id;
-        })->toArray();
+        $proyectosAsignadosIds = $asignacionesRaw->pluck('proyecto_id')->map(fn($id) => (string) $id)->toArray();
 
         $asignaciones = $asignacionesRaw->map(function ($asig) use ($proyectos, $moderadores) {
             $proyecto = $proyectos->firstWhere('_id', (string)$asig['proyecto_id']);
@@ -57,10 +53,7 @@ class ProyectoController extends Controller
             ];
         });
 
-        // Filtrar proyectos que no estén asignados
-        $proyectosNoAsignados = $proyectos->filter(function($proy) use ($proyectosAsignadosIds){
-            return !in_array($proy['_id'], $proyectosAsignadosIds);
-        });
+        $proyectosNoAsignados = $proyectos->filter(fn($proy) => !in_array($proy['_id'], $proyectosAsignadosIds));
 
         $tab = $request->get('tab', 'crear');
         $proyectoSeleccionado = null;
@@ -68,54 +61,27 @@ class ProyectoController extends Controller
 
         if ($tab === 'seguimiento' && $request->has('id')) {
             $id = $request->get('id');
-            $proyecto = DB::connection('mongodb')
-                ->collection('proyectos')
-                ->where('_id', new ObjectId($id))
-                ->first();
+            $proyecto = DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($id))->first();
 
             if ($proyecto) {
                 $proyectoSeleccionado = [
-                    '_id'          => (string) $proyecto['_id'],
-                    'nombre'       => $proyecto['nombre'] ?? '',
-                    'descripcion'  => $proyecto['descripcion'] ?? '',
-                    'anio'         => $proyecto['anio'] ?? '',
-                    'estado'       => $proyecto['estado'] ?? '',
+                    '_id'         => (string) $proyecto['_id'],
+                    'nombre'      => $proyecto['nombre'] ?? '',
+                    'descripcion' => $proyecto['descripcion'] ?? '',
+                    'anio'        => $proyecto['anio'] ?? '',
+                    'estado'      => $proyecto['estado'] ?? '',
                 ];
 
                 $seguimientos = $proyecto['seguimientos'] ?? [];
             }
         }
 
-<<<<<<< HEAD:app/Http/Controllers/gestor/ProyectoController.php
         return view('gestor.proyectos.index', compact(
             'proyectos',
             'proyectosNoAsignados',
             'tab',
             'proyectoSeleccionado',
             'seguimientos',
-=======
-        $proyectosNoAsignados = DB::connection('mongodb')->collection('proyectos')->whereNull('moderador_id')->get();
-        $moderadores = DB::connection('mongodb')->collection('users')->where('rol_id', 2)->get();
-
-        $asignaciones = DB::connection('mongodb')->collection('proyectos')
-            ->whereNotNull('moderador_id')
-            ->get()
-            ->map(function ($p) {
-                $moderador = DB::connection('mongodb')->collection('users')->find($p['moderador_id']);
-                return [
-                    'proyecto_nombre'    => $p['nombre'] ?? '',
-                    'fecha_asignacion'   => $p['fecha_asignacion'] ?? now(),
-                    'moderador_nombre'   => $moderador['name'] ?? 'Sin nombre'
-                ];
-            });
-
-        return view('gestor.proyectos.index', compact(
-            'proyectos',
-            'tab',
-            'proyectoSeleccionado',
-            'seguimientos',
-            'proyectosNoAsignados',
->>>>>>> 3faeea1a503f1b6edf7823c527f5e83bb45c7af1:app/Http/Controllers/Gestor/ProyectoController.php
             'moderadores',
             'asignaciones'
         ));
@@ -147,12 +113,10 @@ class ProyectoController extends Controller
     public function asignar(Request $request)
     {
         $request->validate([
-<<<<<<< HEAD:app/Http/Controllers/gestor/ProyectoController.php
             'proyecto_id'  => 'required',
             'moderador_id' => 'required',
         ]);
 
-        // Verificar si ya está asignado
         $existe = DB::connection('mongodb')->collection('asignaciones')
             ->where('proyecto_id', new ObjectId($request->proyecto_id))
             ->exists();
@@ -168,27 +132,15 @@ class ProyectoController extends Controller
             'fecha_asignacion' => now(),
         ]);
 
-        // Notificación personalizada al moderador
         $proyecto = DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($request->proyecto_id))->first();
         $mensaje = 'Se te ha asignado el proyecto: ' . ($proyecto['nombre'] ?? 'Proyecto');
+
         \App\Models\NotificacionPersonalizada::create([
             'user_id' => $request->moderador_id,
             'mensaje' => $mensaje,
             'leida' => false,
             'created_at' => now(),
         ]);
-=======
-            'proyecto_id' => 'required',
-            'moderador_id' => 'required',
-        ]);
-
-        DB::connection('mongodb')->collection('proyectos')
-            ->where('_id', new ObjectId($request->proyecto_id))
-            ->update([
-                'moderador_id' => new ObjectId($request->moderador_id),
-                'fecha_asignacion' => now()
-            ]);
->>>>>>> 3faeea1a503f1b6edf7823c527f5e83bb45c7af1:app/Http/Controllers/Gestor/ProyectoController.php
 
         return redirect()->route('gestor.proyectos.index', ['tab' => 'asignar'])
                          ->with('success', 'Proyecto asignado correctamente.');
@@ -256,42 +208,27 @@ class ProyectoController extends Controller
                          ->with('success', 'Evidencia y avance guardados correctamente.');
     }
 
-<<<<<<< HEAD:app/Http/Controllers/gestor/ProyectoController.php
-    public function crear()
-    {
-        return redirect()->route('gestor.proyectos.index', ['tab' => 'crear']);
-    }
-
-    public function seguimiento()
-    {
-        return redirect()->route('gestor.proyectos.index', ['tab' => 'seguimiento']);
-    }
-
-    public function evidencias()
-    {
-        return redirect()->route('gestor.proyectos.index', ['tab' => 'evidencias']);
-    }
+    public function crear()       { return redirect()->route('gestor.proyectos.index', ['tab' => 'crear']); }
+    public function seguimiento() { return redirect()->route('gestor.proyectos.index', ['tab' => 'seguimiento']); }
+    public function evidencias()  { return redirect()->route('gestor.proyectos.index', ['tab' => 'evidencias']); }
 
     public function asignados()
     {
         $user = auth()->user();
-        // Buscar asignaciones del moderador autenticado
-        $asignaciones = \DB::connection('mongodb')->collection('asignaciones')
+        $asignaciones = DB::connection('mongodb')->collection('asignaciones')
             ->where('moderador_id', (string) $user->_id)
             ->get();
+
         $proyectos = collect();
         foreach ($asignaciones as $asig) {
-            $proy = \DB::connection('mongodb')->collection('proyectos')
-                ->where('_id', $asig['proyecto_id'])
-                ->first();
+            $proy = DB::connection('mongodb')->collection('proyectos')->where('_id', $asig['proyecto_id'])->first();
             if ($proy) {
-                if (!isset($proy['evidencias']) || !is_array($proy['evidencias'])) {
-                    $proy['evidencias'] = [];
-                }
                 $proy['_id'] = (string) $proy['_id'];
+                $proy['evidencias'] = $proy['evidencias'] ?? [];
                 $proyectos->push($proy);
             }
         }
+
         return view('gestor.asignados', ['proyectos' => $proyectos]);
     }
 
@@ -300,20 +237,22 @@ class ProyectoController extends Controller
         $request->validate([
             'evidencia' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png',
         ]);
+
         $file = $request->file('evidencia');
         $nombreOriginal = $file->getClientOriginalName();
-        $archivo = uniqid().'_'.$nombreOriginal;
+        $archivo = uniqid() . '_' . $nombreOriginal;
         $file->storeAs('evidencias', $archivo);
 
-        // Actualizar proyecto en MongoDB
-        $proyecto = \DB::connection('mongodb')->collection('proyectos')->where('_id', $proyectoId);
+        $proyecto = DB::connection('mongodb')->collection('proyectos')->where('_id', $proyectoId);
         $proy = $proyecto->first();
-        $evidencias = isset($proy['evidencias']) ? $proy['evidencias'] : [];
+        $evidencias = $proy['evidencias'] ?? [];
+
         $evidencias[] = [
             'nombre' => $nombreOriginal,
             'archivo' => $archivo,
             'fecha' => now(),
         ];
+
         $proyecto->update(['evidencias' => $evidencias]);
 
         return back()->with('success', 'Evidencia subida correctamente.');
@@ -321,7 +260,7 @@ class ProyectoController extends Controller
 
     public function descargarEvidencia($proyectoId, $archivo)
     {
-        $ruta = storage_path('app/evidencias/'.$archivo);
+        $ruta = storage_path('app/evidencias/' . $archivo);
         if (!file_exists($ruta)) {
             abort(404);
         }
@@ -330,26 +269,21 @@ class ProyectoController extends Controller
 
     public function eliminarEvidencia($proyectoId, $archivo)
     {
-        $proyecto = \DB::connection('mongodb')->collection('proyectos')->where('_id', $proyectoId);
+        $proyecto = DB::connection('mongodb')->collection('proyectos')->where('_id', $proyectoId);
         $proy = $proyecto->first();
+
         if (!$proy) {
             return back()->with('error', 'Proyecto no encontrado.');
         }
-        $evidencias = isset($proy['evidencias']) ? $proy['evidencias'] : [];
-        $evidencias = array_filter($evidencias, function($ev) use ($archivo) {
-            return $ev['archivo'] !== $archivo;
-        });
+
+        $evidencias = array_filter($proy['evidencias'] ?? [], fn($ev) => $ev['archivo'] !== $archivo);
         $proyecto->update(['evidencias' => array_values($evidencias)]);
-        // Eliminar archivo físico
-        $ruta = storage_path('app/evidencias/'.$archivo);
+
+        $ruta = storage_path('app/evidencias/' . $archivo);
         if (file_exists($ruta)) {
             @unlink($ruta);
         }
+
         return back()->with('success', 'Evidencia eliminada correctamente.');
     }
-=======
-    public function crear()       { return redirect()->route('gestor.proyectos.index', ['tab' => 'crear']); }
-    public function seguimiento() { return redirect()->route('gestor.proyectos.index', ['tab' => 'seguimiento']); }
-    public function evidencias()  { return redirect()->route('gestor.proyectos.index', ['tab' => 'evidencias']); }
->>>>>>> 3faeea1a503f1b6edf7823c527f5e83bb45c7af1:app/Http/Controllers/Gestor/ProyectoController.php
 }
