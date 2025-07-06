@@ -7,11 +7,6 @@ use Laravel\Sanctum\Sanctum;
 use App\Models\PersonalAccessToken;
 use Illuminate\Support\Facades\Auth;
 use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
-<<<<<<< HEAD
-use Illuminate\Notifications\Notification;
-use App\Models\DatabaseNotification;
-=======
->>>>>>> a42c1154a0cfe32c61ad927fa3ec200f11f22a3e
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,23 +27,15 @@ class AppServiceProvider extends ServiceProvider
             }
 
             $rol = strtolower(trim($user->rol_id));
-/*************************************menu de admin***************************** */
+
+            // ADMIN
             if ($rol === 'admin') {
-                // Menú de ADMIN
-<<<<<<< HEAD
-               /* $event->menu->add([
-=======
                 $event->menu->add([
->>>>>>> a42c1154a0cfe32c61ad927fa3ec200f11f22a3e
                     'text' => 'Dashboard',
                     'icon' => 'fas fa-home',
                     'url'  => 'admin/dashboard',
                 ]);
-<<<<<<< HEAD
-               */
-=======
 
->>>>>>> a42c1154a0cfe32c61ad927fa3ec200f11f22a3e
                 $event->menu->add([
                     'text' => 'Citas Programadas',
                     'icon' => 'fas fa-calendar-alt',
@@ -167,11 +154,9 @@ class AppServiceProvider extends ServiceProvider
                     ],
                 ]);
             }
-/*******************************************menu de gestor************************************************ */
-            if ($rol === 'moderador') {
-                // Menú de MODERADOR
-               
 
+            // MODERADOR
+            if ($rol === 'moderador') {
                 $event->menu->add([
                     'text' => 'Citas Programadas',
                     'icon' => 'fas fa-calendar-alt',
@@ -185,7 +170,7 @@ class AppServiceProvider extends ServiceProvider
                 ]);
 
                 $event->menu->add([
-                    'text' => 'proyectos asiganado',
+                    'text' => 'Proyectos asignados',
                     'icon' => 'fas fa-folder',
                     'url'  => 'gestor/asignados',
                 ]);
@@ -221,41 +206,21 @@ class AppServiceProvider extends ServiceProvider
                 ]);
             }
 
-            // TOPNAV
-<<<<<<< HEAD
+            // 🔔 Notificaciones
             $notificacionesNoLeidas = \App\Models\NotificacionPersonalizada::where('user_id', $user->_id)
                 ->where('leida', false)
                 ->count();
+
             $event->menu->add([
-             'type'          => 'navbar-notification',
-             'id'            => 'notificaciones',
-             'icon'          => 'fas fa-bell',
-             'url'           => 'notificaciones', // Ruta a tu página de notificaciones
-             'topnav_right'  => true,
-             'label'         => $notificacionesNoLeidas > 0 ? $notificacionesNoLeidas : null, // Muestra el contador
-             'dropdown_mode' => false, // No mostrar el menú desplegable
+                'type'          => 'navbar-notification',
+                'id'            => 'notificaciones',
+                'icon'          => 'fas fa-bell',
+                'url'           => 'notificaciones',
+                'topnav_right'  => true,
+                'label'         => $notificacionesNoLeidas > 0 ? $notificacionesNoLeidas : null,
+                'dropdown_mode' => false,
             ]);
 
-
-=======
-            $event->menu->add([
-                'type'            => 'navbar-notification',
-                'id'              => 'notificaciones',
-                'icon'            => 'fas fa-bell',
-                'label'           => 3,
-                'label_color'     => 'danger',
-                'url'             => '#',
-                'topnav_right'    => true,
-                'dropdown_mode'   => true,
-                'dropdown_flabel' => 'Ver todas las notificaciones',
-                'dropdown_items'  => [
-                    ['text' => '1 mensaje nuevo', 'url' => '#'],
-                    ['text' => '2 nuevas solicitudes', 'url' => '#'],
-                    ['text' => '5 solicitudes sin revisar', 'url' => '#'],
-                ],
-            ]);
-
->>>>>>> a42c1154a0cfe32c61ad927fa3ec200f11f22a3e
             $event->menu->add([
                 'type'         => 'navbar-item',
                 'text'         => '',
