@@ -147,4 +147,3 @@ class ProyectoController extends Controller
     public function seguimiento() { return redirect()->route('gestor.proyectos.index', ['tab' => 'seguimiento']); }
     public function evidencias()  { return redirect()->route('gestor.proyectos.index', ['tab' => 'evidencias']); }
 }
-
