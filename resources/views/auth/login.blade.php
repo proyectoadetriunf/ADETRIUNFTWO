@@ -14,7 +14,6 @@
 
         <div class="cont-header">
             <h1>Bienvenid@s</h1>
-<<<<<<< HEAD
 
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -107,7 +106,6 @@
     </header>
 </div>
 
-=======
 
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -191,7 +189,6 @@
     </header>
 </div>
 
->>>>>>> a42c1154a0cfe32c61ad927fa3ec200f11f22a3e
 <script src="{{ asset('js/jquery-3.7.0.min.js') }}"></script>
 <script src="{{ asset('js/login.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
