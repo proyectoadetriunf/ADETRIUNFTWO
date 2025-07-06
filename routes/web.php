@@ -2,13 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-<<<<<<< HEAD
-=======
+use Illuminate\Support\Facades\Password;
+use App\Models\User;
 
 // =======================
 //  CONTROLADORES GLOBAL
 // =======================
->>>>>>> a42c1154a0cfe32c61ad927fa3ec200f11f22a3e
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BeneficiarioController;
 use App\Http\Controllers\AvanceController;
@@ -17,7 +16,7 @@ use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\TuControlador; // Ajusta si es necesario
+use App\Http\Controllers\TuControlador;
 
 // =======================
 //  CONTROLADORES ADMIN
@@ -29,100 +28,6 @@ use App\Http\Controllers\Admin\CitaController as AdminCitaController;
 use App\Http\Controllers\Admin\ComunidadController;
 use App\Http\Controllers\Admin\ConfigController;
 
-<<<<<<< HEAD
-Route::resource('usuarios', UsuarioController::class)->names('usuarios');
-
-/***********************Gestor de proyectos******************************/
-use App\Http\Controllers\Gestor\ProyectoController as GestorProyectoController;
-
-Route::prefix('gestor/proyectos')->group(function () {
-    Route::get('/', [GestorProyectoController::class, 'index'])->name('gestor.proyectos.index');
-    Route::get('/crear', [GestorProyectoController::class, 'crear'])->name('gestor.proyectos.crear');
-    Route::get('/seguimiento', [GestorProyectoController::class, 'seguimiento'])->name('gestor.proyectos.seguimiento');
-    Route::get('/evidencias', [GestorProyectoController::class, 'evidencias'])->name('gestor.proyectos.evidencias');
-    Route::post('/', [GestorProyectoController::class, 'store'])->name('gestor.proyectos.store');
-    Route::post('/{id}/seguimiento', [GestorProyectoController::class, 'agregarSeguimiento'])->name('gestor.proyectos.agregarSeguimiento');
-    Route::get('/seguimiento/{id}', [GestorProyectoController::class, 'verSeguimientos'])->name('gestor.proyectos.verSeguimientos');
-    Route::post('/evidencias/guardar', [GestorProyectoController::class, 'guardarEvidencia'])->name('gestor.proyectos.evidencias.guardar');
-   
-});
-
- Route::prefix('gestor')->middleware('gestor')->group(function () {
-    Route::get('/comuni', [App\Http\Controllers\gestor\ComuniController::class, 'index'])->name('gestor.comuni');
-});
-
-Route::post('/asignar', [App\Http\Controllers\ProyectoController::class, 'asignar'])->name('gestor.proyectos.asignar');
-
-use App\Http\Controllers\Gestor\ProyectoController;
-
-
-Route::prefix('gestor/proyectos')->name('gestor.proyectos.')->group(function() {
-    Route::get('/', [ProyectoController::class, 'index'])->name('index');
-    Route::post('/store', [ProyectoController::class, 'store'])->name('store');
-    Route::post('/asignar', [ProyectoController::class, 'asignar'])->name('asignar');
-    Route::post('/evidencias/guardar', [ProyectoController::class, 'guardarEvidencia'])->name('evidencias.guardar');
-});
-
-
-
-/***********************************************************************/
-
-/**********************************Salon******************************** */
-// Rutas de gestión del salón
-Route::prefix('gestor/salon')->middleware(['auth'])->group(function () {
-    Route::get('/', [App\Http\Controllers\SalonController::class, 'index'])->name('gestor.salon.index');
-    Route::post('/guardar', [App\Http\Controllers\SalonController::class, 'guardar'])->name('gestor.salon.guardar');
-});
-
-
-
-
-/*********************************************************************** */
-/**********************************tareas***********************************************/
-
-use App\Http\Controllers\Gestor\TareaController;
-Route::prefix('gestor/tareas')->group(function () {
-    // Vista principal de tareas/actividades
-    Route::get('/', [TareaController::class, 'index'])->name('gestor.tareas.index');
-
-    // Guardar nueva tarea
-    Route::post('/guardar', [TareaController::class, 'guardar'])->name('gestor.tareas.guardar');
-
-    // Cambiar estado de una tarea (ej: Pendiente -> Completada)
-    Route::post('/{id}/completar', [TareaController::class, 'completar'])->name('gestor.tareas.completar');
-});
-
-/***************************************************************************************/
-
-/**********************************citas********************************************** */
-use App\Http\Controllers\CitasController;
-
-Route::prefix('gestor/citas')->middleware(['auth'])->group(function () {
-    Route::get('/', [CitasController::class, 'index'])->name('gestor.citas.index');
-    Route::post('/guardar', [CitasController::class, 'guardar'])->name('gestor.citas.guardar');
-});
-
-    
-
-/*********************************beneficiarios******************************************** */
-
-Route::prefix('gestor/beneficiarios')->group(function () {
-    Route::get('/', [App\Http\Controllers\Gestor\BenelisController::class, 'index'])->name('beneficiarios.index');
-    Route::get('/encuesta/{id}', [App\Http\Controllers\Gestor\BenelisController::class, 'encuesta'])->name('beneficiarios.encuesta');
-});
-Route::prefix('gestor/beneficiarios')->group(function () {
-    Route::get('/', [App\Http\Controllers\Gestor\BenelisController::class, 'index'])->name('beneficiarios.index');
-    Route::get('/encuesta/{id}', [App\Http\Controllers\Gestor\BenelisController::class, 'encuesta'])->name('beneficiarios.encuesta');
-    Route::post('/encuesta/{id}/guardar', [App\Http\Controllers\Gestor\BenelisController::class, 'guardarEncuesta'])->name('beneficiarios.guardarEncuesta');
-});
-Route::get('/gestor/documentos', [App\Http\Controllers\Gestor\DocumentosController::class, 'index'])->name('documentos.index');
-Route::get('/gestor/documentos/exportar/{tipo}', [App\Http\Controllers\Gestor\DocumentosController::class, 'exportar'])->name('documentos.exportar');
-    Route::get('/gestor/documentos/exportar/{tipo}', [App\Http\Controllers\Gestor\DocumentosController::class, 'exportar'])->name('documentos.exportar');
-
-
-
-    Route::get('resumen-general', [ResumenController::class, 'index'])->name('resumen.index');
-=======
 // =======================
 //  CONTROLADORES GESTOR
 // =======================
@@ -131,7 +36,6 @@ use App\Http\Controllers\Gestor\TareaController;
 use App\Http\Controllers\Gestor\CitasController;
 use App\Http\Controllers\Gestor\BenelisController;
 use App\Http\Controllers\Gestor\DocumentosController;
->>>>>>> a42c1154a0cfe32c61ad927fa3ec200f11f22a3e
 use App\Http\Controllers\Gestor\ResumenController;
 use App\Http\Controllers\SalonController;
 
@@ -143,12 +47,22 @@ Auth::routes();
 Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
 // ====================================
-// USUARIOS (resource controller)
+// PANEL PRINCIPAL
 // ====================================
-Route::resource('usuarios', UsuarioController::class)->names('usuarios');
+Route::middleware(['auth', 'adminOTecnicoOnly'])->get('/home', [HomeController::class, 'index'])->name('home');
 
-/*********************** Gestor de proyectos ******************************/
-Route::prefix('gestor/proyectos')->group(function () {
+// ====================================
+// USUARIOS
+// ====================================
+Route::middleware(['auth', 'adminonly'])->prefix('admin')->group(function () {
+    Route::resource('usuarios', UsuarioController::class)->names('usuarios');
+    Route::delete('/usuarios/{id}', [UsuarioController::class, 'destroy'])->name('usuarios.destroy');
+});
+
+// ====================================
+// GESTOR DE PROYECTOS
+// ====================================
+Route::prefix('gestor/proyectos')->middleware('auth')->group(function () {
     Route::get('/',                       [ProyectoController::class, 'index'])->name('gestor.proyectos.index');
     Route::get('/crear',                  [ProyectoController::class, 'crear'])->name('gestor.proyectos.crear');
     Route::get('/seguimiento',            [ProyectoController::class, 'seguimiento'])->name('gestor.proyectos.seguimiento');
@@ -158,160 +72,135 @@ Route::prefix('gestor/proyectos')->group(function () {
     Route::get('/seguimiento/{id}',       [ProyectoController::class, 'verSeguimientos'])->name('gestor.proyectos.verSeguimientos');
     Route::post('/evidencias/guardar',    [ProyectoController::class, 'guardarEvidencia'])->name('gestor.proyectos.evidencias.guardar');
     Route::post('/asignar',               [ProyectoController::class, 'asignar'])->name('gestor.proyectos.asignar');
+    Route::get('/asignados',              [ProyectoController::class, 'asignados'])->name('gestor.asignados');
+    Route::post('/asignados/{proyecto}/evidencia', [ProyectoController::class, 'subirEvidencia'])->name('gestor.evidencia.subir');
+    Route::get('/asignados/{proyecto}/evidencia/{archivo}', [ProyectoController::class, 'descargarEvidencia'])->name('gestor.evidencia.descargar');
+    Route::delete('/asignados/{proyecto}/evidencia/{archivo}', [ProyectoController::class, 'eliminarEvidencia'])->name('gestor.evidencia.eliminar');
 });
 
-/********************************** Tareas *********************************/
-Route::prefix('gestor/tareas')->group(function () {
+// ====================================
+// GESTOR: TAREAS
+// ====================================
+Route::prefix('gestor/tareas')->middleware('auth')->group(function () {
     Route::get('/',                 [TareaController::class, 'index'])->name('gestor.tareas.index');
     Route::post('/guardar',         [TareaController::class, 'guardar'])->name('gestor.tareas.guardar');
     Route::post('/{id}/completar',  [TareaController::class, 'completar'])->name('gestor.tareas.completar');
 });
 
-/********************************** Citas **********************************/
-Route::prefix('gestor/citas')->group(function () {
+// ====================================
+// GESTOR: CITAS
+// ====================================
+Route::prefix('gestor/citas')->middleware('auth')->group(function () {
     Route::get('/',           [CitasController::class, 'index'])->name('gestor.citas.index');
     Route::post('/guardar',   [CitasController::class, 'guardar'])->name('gestor.citas.guardar');
 });
 
-/********************************* Beneficiarios ***************************/
-Route::prefix('gestor/beneficiarios')->group(function () {
+// ====================================
+// GESTOR: BENEFICIARIOS
+// ====================================
+Route::prefix('gestor/beneficiarios')->middleware('auth')->group(function () {
     Route::get('/',                          [BenelisController::class, 'index'])->name('beneficiarios.index');
     Route::get('/encuesta/{id}',             [BenelisController::class, 'encuesta'])->name('beneficiarios.encuesta');
     Route::post('/encuesta/{id}/guardar',    [BenelisController::class, 'guardarEncuesta'])->name('beneficiarios.guardarEncuesta');
 });
 
-/******************************** Documentos *******************************/
-Route::prefix('gestor/documentos')->group(function () {
+// ====================================
+// GESTOR: DOCUMENTOS
+// ====================================
+Route::prefix('gestor/documentos')->middleware('auth')->group(function () {
     Route::get('/',                [DocumentosController::class, 'index'])->name('documentos.index');
     Route::get('/exportar/{tipo}', [DocumentosController::class, 'exportar'])->name('documentos.exportar');
 });
 
-/***************************** Resumen general *****************************/
+// ====================================
+// GESTOR: OTROS
+// ====================================
 Route::get('gestor/dashboard', [ResumenController::class, 'index'])->name('resumen.index');
-
-/********************************** Salon **********************************/
-Route::prefix('gestor/salon')->middleware(['auth'])->group(function () {
+Route::prefix('gestor/salon')->middleware('auth')->group(function () {
     Route::get('/',            [SalonController::class, 'index'])->name('gestor.salon.index');
     Route::post('/guardar',    [SalonController::class, 'guardar'])->name('gestor.salon.guardar');
 });
-
-/**************************** Panel Principal ******************************/
-Route::middleware(['auth', 'adminOTecnicoOnly'])->get('/home', [HomeController::class, 'index'])->name('home');
-
-// ====================================
-// RUTAS PARA ADMIN Y TÉCNICOS
-// ====================================
-Route::middleware(['auth', 'adminOTecnicoOnly'])->group(function () {
-    // Usuarios
-    Route::get('/users', [UserController::class, 'index']);
-    Route::post('/users', [UserController::class, 'store']);
-
-    // Beneficiarios CRUD
-    Route::get('/beneficiarios',                 [BeneficiarioController::class, 'index'])->name('beneficiarios.index.panel');
-    Route::post('/beneficiarios',                [BeneficiarioController::class, 'store'])->name('beneficiarios.store');
-    Route::get('/beneficiarios/{id}/edit',       [BeneficiarioController::class, 'edit'])->name('beneficiarios.edit');
-    Route::put('/beneficiarios/{id}',            [BeneficiarioController::class, 'update'])->name('beneficiarios.update');
-    Route::delete('/beneficiarios/{id}',         [BeneficiarioController::class, 'destroy'])->name('beneficiarios.destroy');
-
-    // Select dependientes
-    Route::get('/api/municipios/{departamento_id}', [BeneficiarioController::class, 'obtenerMunicipios']);
-    Route::get('/api/colonias/{municipio_id}',      [BeneficiarioController::class, 'obtenerColonias']);
-
-    // Avances
-    Route::get('/avances/create', [AvanceController::class, 'create'])->name('avances.create');
-
-    // Documentos
-    Route::get('/documentos/upload', [DocumentoController::class, 'upload'])->name('documentos.upload');
-
-    // Solicitudes
-    Route::get('/solicitudes/create', [SolicitudController::class, 'create'])->name('solicitudes.create');
+Route::prefix('gestor')->middleware('gestor')->group(function () {
+    Route::get('/comuni', [App\Http\Controllers\Gestor\ComuniController::class, 'index'])->name('gestor.comuni');
 });
 
 // ====================================
-// Calendario y utilidades
+// CRUD Beneficiarios (para admin/técnico)
 // ====================================
+Route::middleware(['auth', 'adminOTecnicoOnly'])->group(function () {
+    Route::get('/beneficiarios', [BeneficiarioController::class, 'index'])->name('beneficiarios.index.panel');
+    Route::post('/beneficiarios', [BeneficiarioController::class, 'store'])->name('beneficiarios.store');
+    Route::get('/beneficiarios/{id}/edit', [BeneficiarioController::class, 'edit'])->name('beneficiarios.edit');
+    Route::put('/beneficiarios/{id}', [BeneficiarioController::class, 'update'])->name('beneficiarios.update');
+    Route::delete('/beneficiarios/{id}', [BeneficiarioController::class, 'destroy'])->name('beneficiarios.destroy');
+
+    Route::get('/api/municipios/{departamento_id}', [BeneficiarioController::class, 'obtenerMunicipios']);
+    Route::get('/api/colonias/{municipio_id}', [BeneficiarioController::class, 'obtenerColonias']);
+});
+
+// ====================================
+// AVANCES, DOCUMENTOS, SOLICITUDES
+// ====================================
+Route::get('/avances/create', [AvanceController::class, 'create'])->middleware('auth')->name('avances.create');
+Route::get('/documentos/upload', [DocumentoController::class, 'upload'])->middleware('auth')->name('documentos.upload');
+Route::get('/solicitudes/create', [SolicitudController::class, 'create'])->middleware('auth')->name('solicitudes.create');
+
+// ====================================
+// PERFIL, CHAT Y MAPA
+// ====================================
+Route::get('/perfil/edit', [PerfilController::class, 'edit'])->name('perfil.edit');
+Route::post('/perfil/update', [PerfilController::class, 'update'])->name('perfil.update');
+
+Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+Route::post('/chat/mensaje', [ChatController::class, 'store'])->name('chat.store');
+Route::delete('/chat/mensaje/{id}', [ChatController::class, 'destroy'])->name('chat.destroy');
+
 Route::middleware('auth')->get('/calendario', fn () => view('pages.calendar'));
 Route::get('/mapa', [TuControlador::class, 'mostrarMapa'])->name('mapa');
 
 // ====================================
-// Mensajería
-// ====================================
-Route::get('/chat',              [ChatController::class, 'index'])->name('chat.index');
-Route::post('/chat/mensaje',     [ChatController::class, 'store'])->name('chat.store');
-Route::delete('/chat/mensaje/{id}', [ChatController::class, 'destroy'])->name('chat.destroy');
-
-// ====================================
-// Perfil
-// ====================================
-Route::get('perfil/edit',    [PerfilController::class, 'edit'])->name('perfil.edit');
-Route::post('perfil/update', [PerfilController::class, 'update'])->name('perfil.update');
-
-// ====================================
-// RUTAS SOLO PARA ADMINISTRADOR
+// ADMIN: ROLES, REPORTES, CONFIGURACIÓN
 // ====================================
 Route::middleware(['auth', 'adminonly'])->prefix('admin')->group(function () {
-    // Usuarios
-    Route::resource('usuarios', UsuarioController::class)->names('usuarios');
-    Route::delete('/usuarios/{id}', [UsuarioController::class, 'destroy'])->name('usuarios.destroy');
+    Route::get('/roles', [RolController::class, 'index'])->name('admin.roles');
+    Route::get('/roles/create', [RolController::class, 'create'])->name('admin.roles.create');
+    Route::post('/roles/store', [RolController::class, 'store'])->name('admin.roles.store');
+    Route::get('/roles/{id}/edit', [RolController::class, 'edit'])->name('admin.roles.edit');
+    Route::put('/roles/{id}', [RolController::class, 'update'])->name('admin.roles.update');
+    Route::delete('/roles/{id}', [RolController::class, 'destroy'])->name('admin.roles.destroy');
+    Route::post('/roles/asignar', [RolController::class, 'asignar'])->name('admin.roles.asignar');
 
-    // Roles
-    Route::get('/roles',                 [RolController::class, 'index'])->name('admin.roles');
-    Route::get('/roles/create',          [RolController::class, 'create'])->name('admin.roles.create');
-    Route::post('/roles/store',          [RolController::class, 'store'])->name('admin.roles.store');
-    Route::get('/roles/{id}/edit',       [RolController::class, 'edit'])->name('admin.roles.edit');
-    Route::put('/roles/{id}',            [RolController::class, 'update'])->name('admin.roles.update');
-    Route::delete('/roles/{id}',         [RolController::class, 'destroy'])->name('admin.roles.destroy');
-    Route::post('/roles/asignar',        [RolController::class, 'asignar'])->name('admin.roles.asignar');
+    Route::get('/reportes/avances', [ReporteController::class, 'avances'])->name('admin.reportes.avances');
+    Route::get('/reportes/financieros', [ReporteController::class, 'financieros'])->name('admin.reportes.financieros');
+    Route::get('/reportes/comunidades', [ReporteController::class, 'comunidades'])->name('admin.reportes.comunidades');
 
-    // Reportes
-    Route::get('/reportes/avances',      [ReporteController::class, 'avances'])->name('admin.reportes.avances');
-    Route::get('/reportes/financieros',  [ReporteController::class, 'financieros'])->name('admin.reportes.financieros');
-    Route::get('/reportes/comunidades',  [ReporteController::class, 'comunidades'])->name('admin.reportes.comunidades');
+    Route::get('/citas', [AdminCitaController::class, 'index'])->name('admin.citas');
+    Route::get('/comunidades', [ComunidadController::class, 'index'])->name('admin.comunidades');
 
-    // Citas
-    Route::get('/citas',                 [AdminCitaController::class, 'index'])->name('admin.citas');
-
-    // Comunidades
-    Route::get('/comunidades',           [ComunidadController::class, 'index'])->name('admin.comunidades');
-
-    // Configuración
-    Route::get('/configuraciones',       [ConfigController::class, 'index'])->name('admin.configuraciones');
+    Route::get('/configuraciones', [ConfigController::class, 'index'])->name('admin.configuraciones');
     Route::post('/configuraciones/guardar', [ConfigController::class, 'guardarConfiguraciones'])->name('admin.configuraciones.guardar');
 });
 
-<<<<<<< HEAD
-Route::get('notificaciones', [App\Http\Controllers\NotificacionController::class, 'index'])
-    ->name('notificaciones')
-    ->middleware('auth');
+// ====================================
+// NOTIFICACIONES
+// ====================================
+Route::get('/notificaciones', [App\Http\Controllers\NotificacionController::class, 'index'])->middleware('auth')->name('notificaciones');
 
-Route::get('gestor/asignados', [App\Http\Controllers\Gestor\ProyectoController::class, 'asignados'])->name('gestor.asignados')->middleware('auth');
-Route::post('gestor/asignados/{proyecto}/evidencia', [App\Http\Controllers\Gestor\ProyectoController::class, 'subirEvidencia'])->name('gestor.evidencia.subir')->middleware('auth');
-Route::get('gestor/asignados/{proyecto}/evidencia/{archivo}', [App\Http\Controllers\Gestor\ProyectoController::class, 'descargarEvidencia'])->name('gestor.evidencia.descargar')->middleware('auth');
-Route::delete('gestor/asignados/{proyecto}/evidencia/{archivo}', [App\Http\Controllers\Gestor\ProyectoController::class, 'eliminarEvidencia'])->name('gestor.evidencia.eliminar')->middleware('auth');
-
-
-use Illuminate\Support\Facades\Password;
-use App\Models\User;
-
+// ====================================
+// TEST DE CORREO
+// ====================================
 Route::get('/test-email', function () {
     $user = User::where('email', 'nery.varela@gmail.com')->first();
 
-    if (!$user) {
-        return '❌ Usuario no encontrado.';
-    }
-
-    // Generar token y enviar correo manualmente
+    if (!$user) return '❌ Usuario no encontrado.';
     $token = Password::createToken($user);
     $user->sendPasswordResetNotification($token);
-
     return '✅ Correo de recuperación enviado correctamente.';
 });
 
-=======
 // ====================================
-// RUTA PÚBLICA PARA MANTENIMIENTO
+// PÁGINA DE MANTENIMIENTO
 // ====================================
 Route::get('/mantenimiento', function () {
     return view('mantenimiento');
 })->name('mantenimiento');
->>>>>>> a42c1154a0cfe32c61ad927fa3ec200f11f22a3e
