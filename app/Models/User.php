@@ -44,4 +44,18 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public function notifications()
+    {
+        return $this->morphMany(\App\Models\DatabaseNotification::class, 'notifiable')
+            ->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Forzar notificaciones a usar MongoDB.
+     */
+    public function routeNotificationForDatabase($notification)
+    {
+        return (new \App\Models\DatabaseNotification)->setConnection('mongodb');
+    }
 }

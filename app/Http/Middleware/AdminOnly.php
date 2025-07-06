@@ -9,7 +9,7 @@ class AdminOnly
 {
     public function handle(Request $request, Closure $next)
     {
-        if (auth()->check() && auth()->user()->rol_id == 1) {
+        if (auth()->check() && auth()->user()->rol_id === 'admin') {
             return $next($request);
         }
 

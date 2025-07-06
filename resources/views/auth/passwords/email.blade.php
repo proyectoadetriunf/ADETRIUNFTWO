@@ -1,47 +1,66 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title> ADETRIUNF | Recuperar contraseña</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
+    {{-- Bootstrap y CSS personalizado --}}
+    <link href="{{ asset('login_libs/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('login_libs/login.css') }}" rel="stylesheet">
+</head>
 
-                <div class="card-body">
-                    @if (session('status'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
+<body>
+    <div class="wrapper">
+        <div id="formContent">
 
-                    <form method="POST" action="{{ route('password.email') }}">
-                        @csrf
-
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Send Password Reset Link') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+            <!-- Título -->
+            <div>
+                <h4><b>ADETRIUNF</b></h4>
             </div>
+
+            <!-- Icono -->
+            <div>
+                <img src="{{ asset('login_libs/email.png') }}" id="icon" alt="User Icon" />
+            </div>
+
+            <!-- Mensaje de éxito -->
+            @if (session('status'))
+                <div class="alert alert-success mx-4 mt-2" role="alert">
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            <!-- Formulario -->
+            <form method="POST" action="{{ route('password.email') }}">
+                @csrf
+
+                <input type="email" id="email" name="email" placeholder="Correo Electrónico"
+                    value="{{ old('email') }}" required autocomplete="email" autofocus
+                    class="@error('email') is-invalid @enderror">
+
+                @error('email')
+                    <div style="color:red; font-size: 0.9rem; margin-bottom: 10px;">
+                        {{ $message }}
+                    </div>
+                @enderror
+
+                <div class="loginButton">
+                    <input type="submit" value="Enviar Contraseña">
+                </div>
+            </form>
+
+            <!-- Enlace volver -->
+            <div id="formFooter">
+                <a class="underlineHover" href="{{ route('login') }}">Volver a iniciar sesión</a>
+            </div>
+
         </div>
     </div>
-</div>
-@endsection
+
+    <!-- Scripts -->
+    <script src="{{ asset('login_libs/jquery.min.js') }}"></script>
+    <script src="{{ asset('login_libs/bootstrap.min.js') }}"></script>
+</body>
+</html>

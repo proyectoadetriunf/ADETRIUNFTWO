@@ -15,10 +15,10 @@
             <a class="nav-link {{ $tab === 'crear' ? 'active' : '' }}" href="{{ route('gestor.proyectos.index', ['tab' => 'crear']) }}">➕ Crear Proyecto</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ $tab === 'seguimiento' ? 'active' : '' }}" href="{{ route('gestor.proyectos.index', ['tab' => 'seguimiento']) }}">📊 Seguimiento</a>
+            <a class="nav-link {{ $tab === 'asignar' ? 'active' : '' }}" href="{{ route('gestor.proyectos.index', ['tab' => 'asignar']) }}">✅ Asignar Proyecto</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ $tab === 'evidencias' ? 'active' : '' }}" href="{{ route('gestor.proyectos.index', ['tab' => 'evidencias']) }}">🖇️ Evidencias</a>
+            <a class="nav-link {{ $tab === 'seguimiento' ? 'active' : '' }}" href="{{ route('gestor.proyectos.index', ['tab' => 'seguimiento']) }}">📊 Seguimiento</a>
         </li>
     </ul>
 
@@ -74,100 +74,129 @@
                 <div class="form-group">
                     <label>Estado</label>
                     <select class="form-control" name="estado" required>
-                        <option value="En planificación">En planificación</option>
-                        <option value="En progreso">En progreso</option>
-                        <option value="Finalizado">Finalizado</option>
+                        <option value="Planificación">Planificación</option>
+                        <option value="Aprobado">Aprobado</option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-success">Guardar Proyecto</button>
             </form>
         </div>
 
-        <!-- Seguimiento -->
-<div class="tab-pane fade {{ $tab === 'seguimiento' ? 'show active' : '' }}" id="seguimiento" role="tabpanel">
-    @if(isset($proyectoSeleccionado))
-        <h3>📊 Seguimiento del Proyecto: {{ $proyectoSeleccionado['nombre'] }}</h3>
-
-        @php
-    $total = 0;
-    foreach ($seguimientos as $s) {
-        $total += $s['avance'] ?? 0;
-    }
-
-    $claseColor = 'info';
-    if ($total >= 100) {
-        $claseColor = 'success';
-    } elseif ($total >= 50) {
-        $claseColor = 'warning';
-    } else {
-        $claseColor = 'danger';
-    }
-@endphp
-
-<div class="alert alert-{{ $claseColor }}">
-    <strong>Progreso Total del Proyecto:</strong> {{ $total }}%
-    @if($total >= 100)
-        <br><span class="font-weight-bold text-success">¡Proyecto Finalizado!</span>
-    @endif
-</div>
-
-        @if(!empty($seguimientos) && is_array($seguimientos) && count($seguimientos) > 0)
+        <!-- Asignar Proyecto -->
+        <div class="tab-pane fade {{ $tab === 'asignar' ? 'show active' : '' }}" id="asignar" role="tabpanel">
+            <h3>✅ Asignar Proyecto a Moderador</h3>
             <table class="table table-bordered mt-3">
                 <thead class="thead-dark">
                     <tr>
-                        <th>Fecha</th>
-                        <th>Avance (%)</th>
-                        <th>Comentario</th>
+                        <th>Nombre del Proyecto</th>
+                        <th>Acción</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($seguimientos as $seg)
+                    @forelse($proyectosNoAsignados as $proyecto)
                         <tr>
-                            <td>{{ $seg['fecha'] ?? '' }}</td>
-                            <td>{{ $seg['avance'] ?? 0 }}%</td>
-                            <td>{{ $seg['comentario'] ?? '' }}</td>
+                            <td>{{ $proyecto['nombre'] }}</td>
+                            <td>
+                                <form method="POST" action="{{ route('gestor.proyectos.asignar') }}">
+                                    @csrf
+                                    <input type="hidden" name="proyecto_id" value="{{ $proyecto['_id'] }}">
+                                    <div class="form-row align-items-center">
+                                        <div class="col-auto">
+                                            <select name="moderador_id" class="form-control" required>
+                                                <option value="">-- Seleccione Moderador --</option>
+                                                @foreach($moderadores as $moderador)
+                                                    <option value="{{ $moderador['_id'] }}">{{ $moderador['name'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="submit" class="btn btn-primary btn-sm">Asignar</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr><td colspan="2" class="text-center">Todos los proyectos están asignados.</td></tr>
+                    @endforelse
                 </tbody>
             </table>
-        @else
-            <div class="alert alert-warning">Este proyecto no tiene seguimientos registrados.</div>
-        @endif
-    @else
-        <div class="alert alert-info">Seleccione un proyecto desde la pestaña "Ver Proyectos" para ver su seguimiento.</div>
-    @endif
-</div>
 
-        <!-- Evidencias -->
-        <div class="tab-pane fade {{ $tab === 'evidencias' ? 'show active' : '' }}" id="evidencias" role="tabpanel">
-            <h3>🖇️ Subir Evidencia de Proyecto</h3>
+            <h4 class="mt-5">📋 Proyectos Asignados</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Proyecto</th>
+                        <th>Fecha de Asignación</th>
+                        <th>Moderador Asignado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($asignaciones as $asignacion)
+                        <tr>
+                            <td>{{ $asignacion['proyecto_nombre'] }}</td>
+                            <td>{{ \Carbon\Carbon::parse($asignacion['fecha_asignacion'])->format('d/m/Y') }}</td>
+                            <td>{{ $asignacion['moderador_nombre'] }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="3" class="text-center">No hay asignaciones registradas.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-            <form action="{{ route('gestor.proyectos.evidencias.guardar') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="form-group">
-                    <label>Seleccionar Proyecto</label>
-                    <select class="form-control" name="proyecto_id" required>
-                        <option value="">-- Seleccione --</option>
-                        @foreach($proyectos as $proyecto)
-                            <option value="{{ $proyecto['_id'] }}">{{ $proyecto['nombre'] }}</option>
-                        @endforeach
-                    </select>
+        <!-- Seguimiento -->
+        <div class="tab-pane fade {{ $tab === 'seguimiento' ? 'show active' : '' }}" id="seguimiento" role="tabpanel">
+            @if(isset($proyectoSeleccionado))
+                <h3>📊 Seguimiento del Proyecto: {{ $proyectoSeleccionado['nombre'] }}</h3>
+
+                @php
+                    $total = 0;
+                    foreach ($seguimientos as $s) {
+                        $total += $s['avance'] ?? 0;
+                    }
+                    $claseColor = 'info';
+                    if ($total >= 100) {
+                        $claseColor = 'success';
+                    } elseif ($total >= 50) {
+                        $claseColor = 'warning';
+                    } else {
+                        $claseColor = 'danger';
+                    }
+                @endphp
+
+                <div class="alert alert-{{ $claseColor }}">
+                    <strong>Progreso Total del Proyecto:</strong> {{ $total }}%
+                    @if($total >= 100)
+                        <br><span class="font-weight-bold text-success">¡Proyecto Finalizado!</span>
+                    @endif
                 </div>
-                <div class="form-group">
-                    <label>Comentario</label>
-                    <textarea class="form-control" name="comentario" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Avance (%)</label>
-                    <input type="range" class="form-control-range" name="avance" min="0" max="100" step="1" oninput="this.nextElementSibling.value = this.value">
-                    <output>0</output>%
-                </div>
-                <div class="form-group">
-                    <label>Archivo Evidencia</label>
-                    <input type="file" class="form-control-file" name="archivo">
-                </div>
-                <button type="submit" class="btn btn-primary">Subir Evidencia y Avance</button>
-            </form>
+
+                @if(!empty($seguimientos) && is_array($seguimientos) && count($seguimientos) > 0)
+                    <table class="table table-bordered mt-3">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Avance (%)</th>
+                                <th>Comentario</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($seguimientos as $seg)
+                                <tr>
+                                    <td>{{ $seg['fecha'] ?? '' }}</td>
+                                    <td>{{ $seg['avance'] ?? 0 }}%</td>
+                                    <td>{{ $seg['comentario'] ?? '' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <div class="alert alert-warning">Este proyecto no tiene seguimientos registrados.</div>
+                @endif
+            @else
+                <div class="alert alert-info">Seleccione un proyecto desde la pestaña "Ver Proyectos" para ver su seguimiento.</div>
+            @endif
         </div>
     </div>
 </div>

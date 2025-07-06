@@ -59,8 +59,8 @@ return [
     'classes_auth_btn' => 'btn-flat btn-primary',
 
     'classes_sidebar' => 'sidebar-dark-primary elevation-4',
-    'classes_topnav' => 'navbar-white navbar-light',
-    'classes_topnav_nav' => 'navbar-expand',
+    'classes_topnav' => 'navbar-light bg-white',
+    'classes_topnav_nav' => 'navbar-expand navbar-light',
     'classes_topnav_container' => 'container',
 
     'sidebar_mini' => 'lg',
@@ -85,207 +85,46 @@ return [
     'laravel_css_path' => 'css/app.css',
     'laravel_js_path' => 'js/app.js',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Menu Items
+    |--------------------------------------------------------------------------
+    |
+    | Aquí definimos los íconos de notificaciones y configuración
+    | que aparecerán siempre en la barra superior.
+    |
+    */
+
     'menu' => [
-
-        // 🔍 Buscador en barra lateral
+        // Notificaciones
         [
-            'type' => 'sidebar-menu-search',
-            'text' => 'Buscar...',
-            ],
-
-            // 📁 Gestión de Proyectos
-            [
-                'text' => 'Gestionar proyectos',
-                'icon' => 'fas fa-folder-plus',
-                'submenu' => [
-                    [
-                        'text' => 'Registrar beneficiario',
-                        'icon' => 'fas fa-user-plus',
-                        'url'  => 'beneficiarios',
-                    ],
-                    [
-                        'text' => 'Registrar avance',
-                        'icon' => 'fas fa-tasks',
-                        'url'  => '#',
-                        'id'   => 'abrirModalAvance',
-                    ],
-                    [
-                        'text' => 'Subir documentación',
-                        'icon' => 'fas fa-upload',
-                        'url'  => '#',
-                        'id'   => 'abrirModalDocumentacion',
-                    ],
-                    [
-                        'text' => 'Crear solicitud',
-                        'icon' => 'fas fa-paper-plane',
-                        'url'  => '#',
-                        'id'   => 'abrirModalSolicitud',
-                    ],
-                ],
-            ],
-
-            // 📅 Calendario
-            [
-                'text' => 'Calendario',
-                'icon' => 'fas fa-calendar-alt',
-                'url'  => 'calendario',
-            ],
-
-
-
-                    // 🧑‍💼 Administración
-            [
-                'text' => 'Administración',
-                'icon' => 'fas fa-user-cog',
-                'submenu' => [
-                    [
-                        'text' => 'Usuarios',
-                        'icon' => 'fas fa-users',
-                        'url'  => 'admin/usuarios',
-                    ],
-                    [
-                        'text' => 'Roles y Permisos',
-                        'icon' => 'fas fa-user-shield',
-                        'url'  => 'admin/roles',
-                    ],
-                ],
-            ],
-
-            // 📊 Reportes
-            [
-                'text' => 'Reportes',
-                'icon' => 'fas fa-chart-line',
-                'submenu' => [
-                    [
-                        'text' => 'Avances por Proyecto',
-                        'icon' => 'fas fa-project-diagram',
-                        'url'  => 'admin/reportes/avances',
-                    ],
-                    [
-                        'text' => 'Financieros',
-                        'icon' => 'fas fa-dollar-sign',
-                        'url'  => 'admin/reportes/financieros',
-                    ],
-                    [
-                        'text' => 'Inversión por Comunidad',
-                        'icon' => 'fas fa-map-marked-alt',
-                        'url'  => 'admin/reportes/comunidades',
-                    ],
-                ],
-            ],
-
-            // 📅 Gestión de Citas
-            [
-                'text' => 'Citas Programadas',
-                'icon' => 'fas fa-calendar-check',
-                'url'  => 'admin/citas',
-            ],
-
-            // 🏘️ Comunidades
-            [
-                'text' => 'Comunidades',
-                'icon' => 'fas fa-map',
-                'url'  => 'admin/comunidades',
-            ],
-
-        // ⚙️ Parámetros del Sistema
-        [
-            'text' => 'Configuraciones',
-            'icon' => 'fas fa-sliders-h',
-            'url'  => 'admin/configuraciones',
-        ],
-
-        /********************************* GESTOR DE PROYECTOS***************************************/
-        [
-    'text' => '👷 Técnico/Gestor de Proyecto',
-    'icon' => 'fas fa-user-cog',
-    'submenu' => [
-        [
-            'text' => '🗂️ Gestión de Proyectos',
-            'url'  => 'gestor/proyectos',
-        ],
-        [
-            'text' => '📋 Actividades / Tareas',
-            'url'  => 'gestor/tareas',
-        ],
-        [
-            'text' => '📅 Citas Programadas',
-            'url'  => 'gestor/citas',
-        ],
-        [
-            'text' => '👥 Beneficiarios',
-            'url'  => 'gestor/beneficiarios',
-        ],
-        [
-            'text' => '📂 Evidencias y Documentos',
-            'url'  => 'gestor/documentos',
-        ],
-       
-        [
-            'text' => '📊 Resumen General',
-            'url'  => 'gestor/dashboard',
-        ],
-    ],
-],
-
-        /***************************************************************************************** */
-
-        // 🔔 Notificaciones (topnav)
-        [
-            'type'            => 'navbar-notification',
-            'id'              => 'notificaciones',
-            'icon'            => 'fas fa-bell',
-            'label'           => 3,
-            'label_color'     => 'danger',
-            'url'             => '#',
-            'topnav_right'    => true,
-            'dropdown_mode'   => true,
-            'dropdown_flabel' => 'Ver todas las notificaciones',
-            'dropdown_items'  => [
+            'key' => 'notifications',
+            'topnav_right' => true,
+            'icon' => 'far fa-bell',
+            'label' => 3,
+            'label_color' => 'warning',
+            'submenu' => [
                 [
-                    'text' => 'Proyecto “Salud Rural” necesita evidencia',
+                    'text' => '1 mensaje nuevo',
                     'url'  => '#',
                 ],
                 [
-                    'text' => '2 documentos faltantes en “Mujeres al Futuro”',
+                    'text' => '2 nuevas solicitudes',
                     'url'  => '#',
                 ],
                 [
-                    'text' => '5 solicitudes sin revisar',
+                    'text' => 'Ver todas las notificaciones',
                     'url'  => '#',
                 ],
             ],
         ],
-
-
-       
-        // 👤 Perfil (topnav)
+        // Configuración
         [
-            'type'         => 'navbar-item',
-            'text'         => '',
-            'icon'         => 'fas fa-user',
-            'url'          => 'perfil/edit',
+            'key' => 'settings',
             'topnav_right' => true,
+            'icon' => 'fas fa-cog',
+            'url'  => '#',
         ],
-
-        // ⚙️ Configuración (topnav)
-        [
-            'type'         => 'navbar-item',
-            'text'         => '',
-            'icon'         => 'fas fa-cog',
-            'url'          => 'configuracion',
-            'topnav_right' => true,
-        ],
-
-        // 🔍 Buscador topnav
-        [
-            'type'         => 'navbar-search',
-            'text'         => 'Buscar...',
-            'topnav_right' => true,
-        ],
-
-
-        
     ],
 
     'filters' => [
