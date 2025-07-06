@@ -9,6 +9,7 @@ use App\Models\Proyecto;
 use App\Models\Persona;
 use App\Models\Solicitud;
 use App\Models\Recibo;
+use Faker\Factory;
 
 class HomeController extends Controller
 {
@@ -28,7 +29,7 @@ class HomeController extends Controller
         $totalSolicitudesPendientes = Solicitud::where('estado', 'pendiente')->count();
         $proyectosSQL = Proyecto::orderBy('created_at', 'desc')->take(5)->get();
 
-        // 🔹 Datos desde MongoDB (como en ComuniController)
+        // 🔹 Datos desde MongoDB
         $beneficiarios = DB::connection('mongodb')
             ->collection('beneficiarios')
             ->count();
@@ -38,6 +39,8 @@ class HomeController extends Controller
             ->get();
 
         $proyectos = collect($proyectosRaw)->map(function ($proyecto) {
+            $faker = Factory::create();
+
             $seguimientos = DB::connection('mongodb')
                 ->collection('seguimientos')
                 ->where('proyecto_id', $proyecto['_id'])
@@ -48,8 +51,8 @@ class HomeController extends Controller
                 $totalAvance += $s['avance'] ?? 0;
             }
 
-            $proyecto['lat'] = $proyecto['lat'] ?? fake()->randomFloat(6, 13.095, 13.105);
-            $proyecto['lng'] = $proyecto['lng'] ?? fake()->randomFloat(6, -87.030, -87.020);
+            $proyecto['lat'] = $proyecto['lat'] ?? $faker->randomFloat(6, 13.095, 13.105);
+            $proyecto['lng'] = $proyecto['lng'] ?? $faker->randomFloat(6, -87.030, -87.020);
             $proyecto['avance_total'] = $totalAvance;
 
             return $proyecto;
