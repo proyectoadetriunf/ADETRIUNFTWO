@@ -8,7 +8,7 @@ use App\Models\User;
 // =======================
 //  CONTROLADORES GLOBAL
 // =======================
->>>>>>> 3faeea1a503f1b6edf7823c527f5e83bb45c7af1
+
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BeneficiarioController;
 use App\Http\Controllers\AvanceController;
@@ -121,17 +121,23 @@ Route::get('/gestor/documentos/exportar/{tipo}', [App\Http\Controllers\Gestor\Do
 
 
 
+
     Route::get('resumen-general', [ResumenController::class, 'index'])->name('resumen.index');
 
 // =======================
 //  CONTROLADORES GESTOR
 // =======================
+
+
+
 use App\Http\Controllers\Gestor\ProyectoController;
 use App\Http\Controllers\Gestor\TareaController;
 use App\Http\Controllers\Gestor\CitasController;
 use App\Http\Controllers\Gestor\BenelisController;
 use App\Http\Controllers\Gestor\DocumentosController;
->>>>>>> 3faeea1a503f1b6edf7823c527f5e83bb45c7af1
+
+
+
 use App\Http\Controllers\Gestor\ResumenController;
 use App\Http\Controllers\SalonController;
 
