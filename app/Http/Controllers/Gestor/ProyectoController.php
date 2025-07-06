@@ -46,15 +46,29 @@ class ProyectoController extends Controller
             }
         }
 
-        //  Agregamos la variable para que la vista no truene
-        $proyectosNoAsignados = [];
+        $proyectosNoAsignados = DB::connection('mongodb')->collection('proyectos')->whereNull('moderador_id')->get();
+        $moderadores = DB::connection('mongodb')->collection('users')->where('rol_id', 2)->get();
+
+        $asignaciones = DB::connection('mongodb')->collection('proyectos')
+            ->whereNotNull('moderador_id')
+            ->get()
+            ->map(function ($p) {
+                $moderador = DB::connection('mongodb')->collection('users')->find($p['moderador_id']);
+                return [
+                    'proyecto_nombre'    => $p['nombre'] ?? '',
+                    'fecha_asignacion'   => $p['fecha_asignacion'] ?? now(),
+                    'moderador_nombre'   => $moderador['name'] ?? 'Sin nombre'
+                ];
+            });
 
         return view('gestor.proyectos.index', compact(
             'proyectos',
             'tab',
             'proyectoSeleccionado',
             'seguimientos',
-            'proyectosNoAsignados' // 
+            'proyectosNoAsignados',
+            'moderadores',
+            'asignaciones'
         ));
     }
 
@@ -79,6 +93,24 @@ class ProyectoController extends Controller
 
         return redirect()->route('gestor.proyectos.index', ['tab' => 'ver'])
                          ->with('success', 'Proyecto creado correctamente.');
+    }
+
+    public function asignar(Request $request)
+    {
+        $request->validate([
+            'proyecto_id' => 'required',
+            'moderador_id' => 'required',
+        ]);
+
+        DB::connection('mongodb')->collection('proyectos')
+            ->where('_id', new ObjectId($request->proyecto_id))
+            ->update([
+                'moderador_id' => new ObjectId($request->moderador_id),
+                'fecha_asignacion' => now()
+            ]);
+
+        return redirect()->route('gestor.proyectos.index', ['tab' => 'asignar'])
+                         ->with('success', 'Proyecto asignado correctamente.');
     }
 
     public function agregarSeguimiento(Request $request, $id)
