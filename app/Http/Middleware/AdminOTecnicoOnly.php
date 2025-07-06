@@ -11,8 +11,8 @@ class AdminOTecnicoOnly
     {
         $rol = auth()->user()->rol_id;
 
-        // ✅ Acepta 1 (admin) o 2 (técnico)
-        if ($rol != 1 && $rol != 2) {
+        // Acepta 'admin' o 'moderador' (si quieres que técnico sea 'moderador')
+        if ($rol !== 'admin' && $rol !== 'moderador') {
             abort(403, 'Acceso restringido. Solo administradores o técnicos.');
         }
 

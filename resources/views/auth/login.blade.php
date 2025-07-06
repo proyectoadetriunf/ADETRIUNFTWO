@@ -1,112 +1,126 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-    body {
-        margin: 0;
-        min-height: 100vh;
-        background: linear-gradient(to bottom, #f39c12, #e74c3c, #e84393);
-        font-family: 'Segoe UI', sans-serif;
-    }
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 
-    .topbar {
-        background-color: white;
-        padding: 15px 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    .topbar .brand {
-        font-weight: bold;
-        font-size: 18px;
-    }
-
-    .topbar .links a {
-        margin-left: 15px;
-        color: #333;
-        text-decoration: none;
-        font-size: 14px;
-    }
-
-    .login-wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: calc(100vh - 70px); /* Resta la altura de la barra superior */
-        padding-top: 30px;
-    }
-
-    .login-card {
-        background: white;
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        width: 100%;
-        max-width: 400px;
-    }
-
-    .login-card h3 {
-        font-weight: bold;
-        color: #2c3e50;
-        text-align: center;
-        margin-bottom: 25px;
-    }
-
-    .form-control {
-        border-radius: 8px;
-        margin-bottom: 15px;
-    }
-
-    .btn-primary {
-        width: 100%;
-        border-radius: 8px;
-        font-weight: bold;
-    }
-
-    .form-check-label {
-        font-size: 14px;
-    }
-
-    .text-link {
-        display: block;
-        margin-top: 10px;
-        text-align: center;
-        font-size: 14px;
-    }
-</style>
-
-
-
-<!--  Login Form -->
-<div class="login-wrapper">
-    <div class="login-card">
-        <h3>Bienvenido a <span class="text-primary">ADETRIUNF</span></h3>
-
-        @if(session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
-
-        <form method="POST" action="{{ route('login') }}">
-            @csrf
-
-            <label for="email">Correo electrónico</label>
-            <input id="email" type="email" name="email" class="form-control" placeholder="Ingresa tu correo" required>
-
-            <label for="password">Contraseña</label>
-            <input id="password" type="password" name="password" class="form-control" placeholder="Ingresa tu contraseña" required>
-
-            <div class="form-check mb-3">
-                <input type="checkbox" class="form-check-input" name="remember" id="remember">
-                <label class="form-check-label" for="remember">Recuérdame</label>
+<div class="d-flex align-items-center justify-content-center min-vh-100">
+    <header class="main-header">
+        <div class="main-cont">
+            <div class="desc-header">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo School" class="school-image">
             </div>
+        </div>
 
-            <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+        <div class="cont-header">
+            <h1>Bienvenid@s</h1>
 
-            <a class="text-link" href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a>
-        </form>
-    </div>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Administrador</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Gestor Proyecto</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="myTabContent">
+                <!-- Administrador -->
+                <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                    <form action="{{ route('login') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="login_role" value="admin">
+
+                        <label for="email_admin">Usuario</label>
+                        <input type="email" name="email" id="email_admin" placeholder="Correo electrónico" required>
+
+                        <label for="password_admin">Contraseña</label>
+                        <input type="password" name="password" id="password_admin" placeholder="Contraseña" required>
+
+                        @if ($errors->has('error'))
+                            <div class="alert alert-danger mt-2">
+                                {{ $errors->first('error') }}
+                            </div>
+                        @elseif ($errors->any())
+                            <div class="alert alert-danger mt-2">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <button id="Loginusuario" type="submit">Iniciar sesión</button>
+
+                      <div class="mt-3 d-flex flex-column align-items-center">
+    <a href="{{ route('password.request') }}" class="btn btn-link">
+        ¿Olvidaste tu contraseña?
+    </a>
+
 </div>
-@endsection
 
+                        
+                    </form>
+                </div>
+
+                <!-- Gestor Proyecto -->
+                <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                    <form action="{{ route('login') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="login_role" value="moderador">
+
+                        <label for="email_gestor">Usuario</label>
+                        <input type="email" name="email" id="email_gestor" placeholder="Correo electrónico" required>
+
+                        <label for="password_gestor">Contraseña</label>
+                        <input type="password" name="password" id="password_gestor" placeholder="Contraseña" required>
+
+                        @if ($errors->has('error'))
+                            <div class="alert alert-danger mt-2">
+                                {{ $errors->first('error') }}
+                            </div>
+                        @elseif ($errors->any())
+                            <div class="alert alert-danger mt-2">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <button id="Loginjefedepto" type="submit">Iniciar sesión</button>
+
+                        <div class="mt-3 d-flex flex-column align-items-center">
+    <a href="{{ route('password.request') }}" class="btn btn-link">
+        ¿Olvidaste tu contraseña?
+    </a>
+    
+</div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+</div>
+
+<script src="{{ asset('js/jquery-3.7.0.min.js') }}"></script>
+<script src="{{ asset('js/login.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+@if(session('rol_actual'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const role = "{{ session('rol_actual') }}";
+        if (role === 'admin') {
+            document.querySelector('#home-tab').click();
+        } else if (role === 'moderador') {
+            document.querySelector('#profile-tab').click();
+        }
+    });
+</script>
+@endif
+
+@endsection

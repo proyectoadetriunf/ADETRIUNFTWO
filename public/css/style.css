@@ -1,0 +1,91 @@
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #064F57 50%, #ffa353 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.main-header {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center;     /* Centra verticalmente */
+    gap: 450px;               /* Espacio entre imagen y formulario */
+    height: 100vh;           /* Ocupa toda la pantalla verticalmente */
+    padding: 20px;
+}
+
+
+.main-cont {
+    display: flex;
+    align-items: center;
+}
+
+.school-image {
+    width: 300px; /* Ajusta al mismo tamaño de la imagen anterior */
+    height: auto;
+    border-radius: 10px; /* Mantiene bordes suaves si es necesario */
+    object-fit: contain; /* Asegura que la imagen no se distorsione */
+}
+
+.desc-header p {
+    font-size: 24px;
+    color: #1e3a42;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.cont-header {
+    background: #FFFFFF;
+    padding: 60px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px #7e7e7e;
+}
+
+h1 {
+    color: #1e3a42;
+    text-align: center;
+    font-size: 28px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+label {
+    font-weight: bold;
+    color: #333;
+    margin-top: 10px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #7e7e7e;
+    border-radius: 5px;
+}
+
+#Loginusuario, #Loginjefedepto {
+    margin-top: 15px;
+    background: #064F57;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #2a4d56;
+}
+
+.alert-danger .close {
+    display: none;
+}
