@@ -19,58 +19,56 @@ class HomeController extends Controller
     }
 
     public function index()
-    {
-        // 🔹 Datos desde MySQL
-        $totalProyectos = Proyecto::count();
-        $totalBeneficiarios = Persona::join('persona_roles', 'personas.persona_id', '=', 'persona_roles.persona_id')
-            ->where('persona_roles.rol_id', 3)
-            ->count();
-        $totalDonaciones = Recibo::count();
-        $totalSolicitudesPendientes = Solicitud::where('estado', 'pendiente')->count();
-        $proyectosSQL = Proyecto::orderBy('created_at', 'desc')->take(5)->get();
+{
+    $totalProyectos = Proyecto::count();
+    $totalBeneficiarios = Persona::join('persona_roles', 'personas.persona_id', '=', 'persona_roles.persona_id')
+        ->where('persona_roles.rol_id', 3)
+        ->count();
+    $totalDonaciones = Recibo::count();
+    $totalSolicitudesPendientes = Solicitud::where('estado', 'pendiente')->count();
+    $proyectosSQL = Proyecto::orderBy('created_at', 'desc')->take(5)->get();
 
-        // 🔹 Datos desde MongoDB
-        $beneficiarios = DB::connection('mongodb')
-            ->collection('beneficiarios')
-            ->count();
+    $beneficiarios = DB::connection('mongodb')
+        ->collection('beneficiarios')
+        ->count();
 
-        $proyectosRaw = DB::connection('mongodb')
-            ->collection('proyectos')
+    $proyectosRaw = DB::connection('mongodb')
+        ->collection('proyectos')
+        ->get();
+
+    $proyectos = collect($proyectosRaw)->map(function ($proyecto) {
+        $faker = \Faker\Factory::create();
+
+        $seguimientos = DB::connection('mongodb')
+            ->collection('seguimientos')
+            ->where('proyecto_id', $proyecto['_id'])
             ->get();
 
-        $proyectos = collect($proyectosRaw)->map(function ($proyecto) {
-            $faker = Factory::create();
+        $totalAvance = 0;
+        foreach ($seguimientos as $s) {
+            $totalAvance += $s['avance'] ?? 0;
+        }
 
-            $seguimientos = DB::connection('mongodb')
-                ->collection('seguimientos')
-                ->where('proyecto_id', $proyecto['_id'])
-                ->get();
+        $proyecto['lat'] = $proyecto['lat'] ?? $faker->randomFloat(6, 13.095, 13.105);
+        $proyecto['lng'] = $proyecto['lng'] ?? $faker->randomFloat(6, -87.030, -87.020);
+        $proyecto['avance_total'] = $totalAvance;
 
-            $totalAvance = 0;
-            foreach ($seguimientos as $s) {
-                $totalAvance += $s['avance'] ?? 0;
-            }
+        return $proyecto;
+    });
 
-            $proyecto['lat'] = $proyecto['lat'] ?? $faker->randomFloat(6, 13.095, 13.105);
-            $proyecto['lng'] = $proyecto['lng'] ?? $faker->randomFloat(6, -87.030, -87.020);
-            $proyecto['avance_total'] = $totalAvance;
+    $proyectosActivos = $proyectos->filter(function ($proyecto) {
+        return !empty($proyecto['nombre']);
+    })->count();
 
-            return $proyecto;
-        });
+    return view('home', compact(
+        'totalProyectos',
+        'totalBeneficiarios',
+        'totalDonaciones',
+        'totalSolicitudesPendientes',
+        'proyectos',
+        'beneficiarios',
+        'proyectosActivos'
+    ));
+}
 
-        $proyectosActivos = $proyectos->filter(function ($proyecto) {
-            return !empty($proyecto['nombre']);
-        })->count();
-
-        // 🔹 Enviar todo a la vista
-        return view('home', compact(
-            'totalProyectos',
-            'totalBeneficiarios',
-            'totalDonaciones',
-            'totalSolicitudesPendientes',
-            'proyectos',
-            'beneficiarios',
-            'proyectosActivos'
-        ));
-    }
 }
