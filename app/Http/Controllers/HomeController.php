@@ -9,7 +9,8 @@ use App\Models\Proyecto;
 use App\Models\Persona;
 use App\Models\Solicitud;
 use App\Models\Recibo;
-use Faker\Factory;
+
+use Faker\Factory as FakerFactory;
 
 class HomeController extends Controller
 {
@@ -37,7 +38,8 @@ class HomeController extends Controller
         ->get();
 
     $proyectos = collect($proyectosRaw)->map(function ($proyecto) {
-        $faker = \Faker\Factory::create();
+         $faker = FakerFactory::create();
+
 
         $seguimientos = DB::connection('mongodb')
             ->collection('seguimientos')
