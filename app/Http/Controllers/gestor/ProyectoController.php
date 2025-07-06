@@ -46,7 +46,16 @@ class ProyectoController extends Controller
             }
         }
 
-        return view('gestor.proyectos.index', compact('proyectos', 'tab', 'proyectoSeleccionado', 'seguimientos'));
+        //  Agregamos la variable para que la vista no truene
+        $proyectosNoAsignados = [];
+
+        return view('gestor.proyectos.index', compact(
+            'proyectos',
+            'tab',
+            'proyectoSeleccionado',
+            'seguimientos',
+            'proyectosNoAsignados' // 
+        ));
     }
 
     public function store(Request $request)
@@ -138,4 +147,3 @@ class ProyectoController extends Controller
     public function seguimiento() { return redirect()->route('gestor.proyectos.index', ['tab' => 'seguimiento']); }
     public function evidencias()  { return redirect()->route('gestor.proyectos.index', ['tab' => 'evidencias']); }
 }
-
