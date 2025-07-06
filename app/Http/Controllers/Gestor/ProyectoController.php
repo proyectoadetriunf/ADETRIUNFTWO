@@ -86,12 +86,36 @@ class ProyectoController extends Controller
             }
         }
 
+<<<<<<< HEAD:app/Http/Controllers/gestor/ProyectoController.php
         return view('gestor.proyectos.index', compact(
             'proyectos',
             'proyectosNoAsignados',
             'tab',
             'proyectoSeleccionado',
             'seguimientos',
+=======
+        $proyectosNoAsignados = DB::connection('mongodb')->collection('proyectos')->whereNull('moderador_id')->get();
+        $moderadores = DB::connection('mongodb')->collection('users')->where('rol_id', 2)->get();
+
+        $asignaciones = DB::connection('mongodb')->collection('proyectos')
+            ->whereNotNull('moderador_id')
+            ->get()
+            ->map(function ($p) {
+                $moderador = DB::connection('mongodb')->collection('users')->find($p['moderador_id']);
+                return [
+                    'proyecto_nombre'    => $p['nombre'] ?? '',
+                    'fecha_asignacion'   => $p['fecha_asignacion'] ?? now(),
+                    'moderador_nombre'   => $moderador['name'] ?? 'Sin nombre'
+                ];
+            });
+
+        return view('gestor.proyectos.index', compact(
+            'proyectos',
+            'tab',
+            'proyectoSeleccionado',
+            'seguimientos',
+            'proyectosNoAsignados',
+>>>>>>> 3faeea1a503f1b6edf7823c527f5e83bb45c7af1:app/Http/Controllers/Gestor/ProyectoController.php
             'moderadores',
             'asignaciones'
         ));
@@ -123,6 +147,7 @@ class ProyectoController extends Controller
     public function asignar(Request $request)
     {
         $request->validate([
+<<<<<<< HEAD:app/Http/Controllers/gestor/ProyectoController.php
             'proyecto_id'  => 'required',
             'moderador_id' => 'required',
         ]);
@@ -152,6 +177,18 @@ class ProyectoController extends Controller
             'leida' => false,
             'created_at' => now(),
         ]);
+=======
+            'proyecto_id' => 'required',
+            'moderador_id' => 'required',
+        ]);
+
+        DB::connection('mongodb')->collection('proyectos')
+            ->where('_id', new ObjectId($request->proyecto_id))
+            ->update([
+                'moderador_id' => new ObjectId($request->moderador_id),
+                'fecha_asignacion' => now()
+            ]);
+>>>>>>> 3faeea1a503f1b6edf7823c527f5e83bb45c7af1:app/Http/Controllers/Gestor/ProyectoController.php
 
         return redirect()->route('gestor.proyectos.index', ['tab' => 'asignar'])
                          ->with('success', 'Proyecto asignado correctamente.');
@@ -219,6 +256,7 @@ class ProyectoController extends Controller
                          ->with('success', 'Evidencia y avance guardados correctamente.');
     }
 
+<<<<<<< HEAD:app/Http/Controllers/gestor/ProyectoController.php
     public function crear()
     {
         return redirect()->route('gestor.proyectos.index', ['tab' => 'crear']);
@@ -309,4 +347,9 @@ class ProyectoController extends Controller
         }
         return back()->with('success', 'Evidencia eliminada correctamente.');
     }
+=======
+    public function crear()       { return redirect()->route('gestor.proyectos.index', ['tab' => 'crear']); }
+    public function seguimiento() { return redirect()->route('gestor.proyectos.index', ['tab' => 'seguimiento']); }
+    public function evidencias()  { return redirect()->route('gestor.proyectos.index', ['tab' => 'evidencias']); }
+>>>>>>> 3faeea1a503f1b6edf7823c527f5e83bb45c7af1:app/Http/Controllers/Gestor/ProyectoController.php
 }

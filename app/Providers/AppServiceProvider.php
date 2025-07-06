@@ -10,6 +10,7 @@ use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
 use Illuminate\Notifications\Notification;
 use App\Models\DatabaseNotification;
 
+
 class AppServiceProvider extends ServiceProvider
 {
     public function register()
@@ -29,15 +30,26 @@ class AppServiceProvider extends ServiceProvider
             }
 
             $rol = strtolower(trim($user->rol_id));
+
 /*************************************menu de admin***************************** */
             if ($rol === 'admin') {
                 // Menú de ADMIN
                /* $event->menu->add([
+
+
+            // ADMIN
+            if ($rol === 'admin') {
+                $event->menu->add([
+
                     'text' => 'Dashboard',
                     'icon' => 'fas fa-home',
                     'url'  => 'admin/dashboard',
                 ]);
+
                */
+
+
+
                 $event->menu->add([
                     'text' => 'Citas Programadas',
                     'icon' => 'fas fa-calendar-alt',
@@ -161,6 +173,11 @@ class AppServiceProvider extends ServiceProvider
                 // Menú de MODERADOR
                
 
+
+
+            // MODERADOR
+            if ($rol === 'moderador') {
+
                 $event->menu->add([
                     'text' => 'Citas Programadas',
                     'icon' => 'fas fa-calendar-alt',
@@ -174,7 +191,10 @@ class AppServiceProvider extends ServiceProvider
                 ]);
 
                 $event->menu->add([
+
                     'text' => 'proyectos asiganado',
+
+                    'text' => 'Proyectos asignados',
                     'icon' => 'fas fa-folder',
                     'url'  => 'gestor/asignados',
                 ]);
@@ -210,6 +230,7 @@ class AppServiceProvider extends ServiceProvider
                 ]);
             }
 
+
             // TOPNAV
             $notificacionesNoLeidas = \App\Models\NotificacionPersonalizada::where('user_id', $user->_id)
                 ->where('leida', false)
@@ -225,6 +246,20 @@ class AppServiceProvider extends ServiceProvider
             ]);
 
 
+            // 🔔 Notificaciones
+            $notificacionesNoLeidas = \App\Models\NotificacionPersonalizada::where('user_id', $user->_id)
+                ->where('leida', false)
+                ->count();
+
+            $event->menu->add([
+                'type'          => 'navbar-notification',
+                'id'            => 'notificaciones',
+                'icon'          => 'fas fa-bell',
+                'url'           => 'notificaciones',
+                'topnav_right'  => true,
+                'label'         => $notificacionesNoLeidas > 0 ? $notificacionesNoLeidas : null,
+                'dropdown_mode' => false,
+            ]);
             $event->menu->add([
                 'type'         => 'navbar-item',
                 'text'         => '',
