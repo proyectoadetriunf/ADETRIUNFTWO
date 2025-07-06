@@ -46,7 +46,16 @@ class ProyectoController extends Controller
             }
         }
 
-        return view('gestor.proyectos.index', compact('proyectos', 'tab', 'proyectoSeleccionado', 'seguimientos'));
+        //  Agregamos la variable para que la vista no truene
+        $proyectosNoAsignados = [];
+
+        return view('gestor.proyectos.index', compact(
+            'proyectos',
+            'tab',
+            'proyectoSeleccionado',
+            'seguimientos',
+            'proyectosNoAsignados' // 
+        ));
     }
 
     public function store(Request $request)
