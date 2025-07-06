@@ -178,7 +178,11 @@ class AdminLteMenuServiceProvider extends ServiceProvider
                 'url'             => '#',
                 'topnav_right'    => true,
                 'dropdown_mode'   => true,
+<<<<<<< HEAD
                 //'dropdown_flabel' => 'Ver todas las notificaciones',
+=======
+                'dropdown_flabel' => 'Ver todas las notificaciones',
+>>>>>>> a42c1154a0cfe32c61ad927fa3ec200f11f22a3e
                 'dropdown_items'  => [
                     [
                         'text' => 'Proyecto “Salud Rural” necesita evidencia',
@@ -280,7 +284,11 @@ class AdminLteMenuServiceProvider extends ServiceProvider
                 'url'             => '#',
                 'topnav_right'    => true,
                 'dropdown_mode'   => true,
+<<<<<<< HEAD
                 //'dropdown_flabel' => 'Ver todas las notificaciones',
+=======
+                'dropdown_flabel' => 'Ver todas las notificaciones',
+>>>>>>> a42c1154a0cfe32c61ad927fa3ec200f11f22a3e
                 'dropdown_items'  => [
                     [
                         'text' => 'Proyecto “Salud Rural” necesita evidencia',

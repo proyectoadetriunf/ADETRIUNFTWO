@@ -13,8 +13,8 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
-    protected $connection = 'mongodb';
-    protected $collection = 'users'; // Tu colección en MongoDB
+    protected $connection = 'mongodb'; // Conexión a MongoDB
+    protected $collection = 'users';   // Nombre de la colección
 
     protected $fillable = [
         'name',
@@ -26,18 +26,17 @@ class User extends Authenticatable implements JWTSubject
     ];
 
     protected $hidden = [
-        'password'
+        'password',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
     ];
 
-    // === JWT Required Methods ===
-
+    // Métodos requeridos por JWT
     public function getJWTIdentifier()
     {
-        return $this->getKey(); // Usualmente es el _id
+        return $this->getKey(); // Mongo usa _id como clave primaria
     }
 
     public function getJWTCustomClaims()
@@ -59,3 +58,4 @@ class User extends Authenticatable implements JWTSubject
         return (new \App\Models\DatabaseNotification)->setConnection('mongodb');
     }
 }
+
