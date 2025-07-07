@@ -67,7 +67,23 @@
                     <label for="password_confirmation" class="form-label fw-semibold">Confirmar Nueva Contraseña</label>
                     <input type="password" name="password_confirmation" id="password_confirmation"
                            class="form-control" placeholder="Confirma la nueva contraseña">
+
                 </div>
+                <!-- Estado (Activo / Inactivo) -->
+<div class="mb-4">
+    <label class="form-label fw-semibold d-block">Estado del Usuario</label>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="is_active" id="activo" value="1"
+            {{ old('is_active', $usuario->is_active) == true ? 'checked' : '' }}>
+        <label class="form-check-label" for="activo">Activo</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="is_active" id="inactivo" value="0"
+            {{ old('is_active', $usuario->is_active) == false ? 'checked' : '' }}>
+        <label class="form-check-label" for="inactivo">Inactivo</label>
+    </div>
+</div>  
+
 
                 <div class="d-flex justify-content-between">
                     <a href="{{ route('usuarios.index') }}" class="btn btn-outline-secondary px-4">Cancelar</a>

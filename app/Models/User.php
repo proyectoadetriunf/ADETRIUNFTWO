@@ -13,49 +13,61 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
-    protected $connection = 'mongodb'; // Conexión a MongoDB
-    protected $collection = 'users';   // Nombre de la colección
+    /* ==== Conexión / colección ==== */
+    protected $connection = 'mongodb';
+    protected $collection = 'users';
 
+    /* ==== Asignación en masa ==== */
     protected $fillable = [
         'name',
         'email',
         'password',
         'rol_id',
         'photo',
-        'is_active',
+
+        'is_active',      // ✔ flag activo/inactivo
+        'is_loading',     // ✔ flag proceso de carga
+        'last_login_at',  // ✔ última conexión
     ];
 
-    protected $hidden = [
-        'password',
-    ];
-
+    /* ==== Casts ==== */
     protected $casts = [
-        'is_active' => 'boolean',
+        'is_active'     => 'boolean',
+        'is_loading'    => 'boolean',
+        'last_login_at' => 'datetime',
     ];
 
-    // Métodos requeridos por JWT
-    public function getJWTIdentifier()
+    /* ==== Valores por defecto en documentos nuevos ==== */
+    protected $attributes = [
+        'is_active'  => true,
+        'is_loading' => false,
+         'last_login_at'  => null,
+    ];
+
+    /* ==== Accessors para evitar null ==== */
+    public function getIsActiveAttribute($value)   { return $value ?? false; }
+    public function getIsLoadingAttribute($value)  { return $value ?? false; }
+    public function getLastLoginAtAttribute($value)
     {
-        return $this->getKey(); // Mongo usa _id como clave primaria
+        return $value ? $this->asDateTime($value) : null;
     }
 
-    public function getJWTCustomClaims()
-    {
-        return [];
-    }
+    /* ==== JWT ==== */
+    public function getJWTIdentifier()   { return $this->getKey(); }
+    public function getJWTCustomClaims() { return []; }
 
+    /* ==== Notificaciones vía Mongo ==== */
     public function notifications()
     {
-        return $this->morphMany(\App\Models\DatabaseNotification::class, 'notifiable')
-            ->orderBy('created_at', 'desc');
+        return $this->morphMany(
+            \App\Models\DatabaseNotification::class,
+            'notifiable'
+        )->orderBy('created_at', 'desc');
     }
 
-    /**
-     * Forzar notificaciones a usar MongoDB.
-     */
     public function routeNotificationForDatabase($notification)
     {
-        return (new \App\Models\DatabaseNotification)->setConnection('mongodb');
+        return (new \App\Models\DatabaseNotification)
+               ->setConnection('mongodb');
     }
 }
-

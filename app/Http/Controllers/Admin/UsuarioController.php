@@ -2,161 +2,99 @@
 
 namespace App\Http\Controllers\Admin;
 
- use MongoDB\BSON\ObjectId; // Agrega esta línea arriba del archivo
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User;
 use MongoDB\BSON\ObjectId;
+use App\Models\User;
 
 class UsuarioController extends Controller
 {
+    /* === LISTAR === */
     public function index()
     {
         $usuarios = User::all();
         return view('admin.usuarios.index', compact('usuarios'));
     }
 
-
-public function destroy($id)
-{
-    try {
-        $usuario = User::where('_id', new ObjectId($id))->firstOrFail();
-        $usuario->delete();
-
-        return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado correctamente.');
-    } catch (\Exception $e) {
-        return redirect()->route('usuarios.index')->with('error', 'Error al eliminar usuario: ' . $e->getMessage());
-    }
-}
-
-
-}
-
-}
-
-
+    /* === FORMULARIO CREAR === */
     public function create()
     {
         return view('admin.usuarios.create');
     }
 
+    /* === GUARDAR === */
     public function store(Request $request)
-{
-    $rules = [
-        'name' => [
-            'required',
-            'string',
-            'max:255',
-            'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'
-        ],
-        'email' => [
-            'required',
-            'string',
-            'email',
-            'regex:/^[^@]+@[^@]+\.(com)$/i',
-            'max:255',
-            'unique:users',
-        ],
-        'password' => [
-            'required',
-            'string',
-            'min:6',
-            'confirmed',
-        ],
-    ];
+    {
+        $request->validate([
+            'name'       => ['required','string','max:255','regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'],
+            'email'      => ['required','string','email','regex:/^[^@]+@[^@]+\.(com)$/i','max:255','unique:users'],
+            'password'   => ['required','string','min:6','confirmed'],
+            'is_active'  => ['required','boolean'],
+            'is_loading' => ['nullable','boolean'],
+        ]);
 
-    $messages = [
-        'name.required' => 'El nombre es obligatorio.',
-        'name.regex' => 'El nombre solo puede contener letras y espacios.',
-        'email.required' => 'El correo electrónico es obligatorio.',
-        'email.email' => 'Debe ingresar un correo válido.',
-        'email.regex' => 'El correo debe contener @ y terminar en .com.',
-        'email.unique' => 'Este correo ya está en uso.',
-        'password.required' => 'La contraseña es obligatoria.',
-        'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
-        'password.confirmed' => 'La confirmación de contraseña no coincide.',
-    ];
+        User::create([
+            'name'       => $request->name,
+            'email'      => $request->email,
+            'password'   => bcrypt($request->password),
+            'is_active'  => $request->boolean('is_active'),
+            'is_loading' => $request->boolean('is_loading'),
+        ]);
 
-    $validated = $request->validate($rules, $messages);
+        return redirect()->route('usuarios.index')
+                         ->with('success', 'Usuario creado correctamente.');
+    }
 
-    User::create([
-        'name' => $validated['name'],
-        'email' => $validated['email'],
-        'password' => bcrypt($validated['password']),
-    ]);
-
-    return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');
-}
-
+    /* === FORMULARIO EDITAR === */
     public function edit($id)
     {
-        $usuario = User::findOrFail($id);
+        $usuario = User::where('_id', new ObjectId($id))->firstOrFail();
         return view('admin.usuarios.edit', compact('usuario'));
     }
 
+    /* === ACTUALIZAR === */
     public function update(Request $request, $id)
     {
-        $usuario = User::findOrFail($id);
+        $usuario = User::where('_id', new ObjectId($id))->firstOrFail();
 
-        $rules = [
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'
-            ],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'regex:/^[^@]+@[^@]+\.(com)$/i',
-                'max:255',
-                'unique:users,email,' . $usuario->_id . ',_id',
-            ],
-            'password' => 'nullable|string|min:6|confirmed',
-        ];
+        $request->validate([
+            'name'       => ['required','string','max:255','regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/'],
+            'email'      => ['required','string','email','regex:/^[^@]+@[^@]+\.(com)$/i','max:255',
+                             'unique:users,email,'.$usuario->_id.',_id'],
+            'password'   => ['nullable','string','min:6','confirmed'],
+            'is_active'  => ['required','boolean'],
+            'is_loading' => ['nullable','boolean'],
+        ]);
 
-        $messages = [
-            'name.required' => 'El nombre es obligatorio.',
-            'name.regex' => 'El nombre solo puede contener letras y espacios.',
-            'email.required' => 'El correo electrónico es obligatorio.',
-            'email.email' => 'El correo debe tener un formato válido.',
-            'email.regex' => 'El correo debe contener @ y terminar en .com.',
-            'email.unique' => 'Este correo ya está en uso.',
-            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
-            'password.confirmed' => 'La confirmación de contraseña no coincide.',
-        ];
+        /* Campos editables */
+        $usuario->name       = $request->name;
+        $usuario->email      = $request->email;
+        $usuario->is_active  = $request->boolean('is_active');
+        $usuario->is_loading = $request->boolean('is_loading');
 
-        $validated = $request->validate($rules, $messages);
-
-        $usuario->name = $validated['name'];
-        $usuario->email = $validated['email'];
-
-        if (!empty($validated['password'])) {
-            $usuario->password = bcrypt($validated['password']);
+        if ($request->filled('password')) {
+            $usuario->password = bcrypt($request->password);
         }
 
         $usuario->save();
 
-        return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado correctamente.');
+        return redirect()->route('usuarios.index')
+                         ->with('success', 'Usuario actualizado correctamente.');
     }
 
+    /* === ELIMINAR === */
     public function destroy($id)
     {
         try {
-            $objectId = new ObjectId($id);
+            $deleted = User::where('_id', new ObjectId($id))->delete();
 
-            $deleted = User::where('_id', $objectId)->delete();
-
-            if ($deleted) {
-                return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado correctamente.');
-            } else {
-                return redirect()->route('usuarios.index')->with('error', 'No se pudo eliminar el usuario.');
-            }
-
+            return redirect()->route('usuarios.index')
+                   ->with($deleted ? 'success' : 'error',
+                          $deleted ? 'Usuario eliminado correctamente.'
+                                   : 'No se pudo eliminar el usuario.');
         } catch (\Exception $e) {
-            return redirect()->route('usuarios.index')->with('error', 'Error al eliminar usuario: ' . $e->getMessage());
+            return redirect()->route('usuarios.index')
+                   ->with('error', 'Error al eliminar usuario: '.$e->getMessage());
         }
     }
 }
-

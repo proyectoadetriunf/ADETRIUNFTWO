@@ -90,6 +90,20 @@
                         title="Debe coincidir con la contraseña ingresada.">
                 </div>
 
+              <!-- Estado (Activo / Inactivo) -->
+<div class="mb-4">
+    <label class="form-label fw-semibold d-block">Estado del Usuario</label>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="is_active" id="activo" value="1" checked>
+        <label class="form-check-label" for="activo">Activo</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="is_active" id="inactivo" value="0">
+        <label class="form-check-label" for="inactivo">Inactivo</label>
+    </div>
+</div>
+
+
                 <div class="d-flex justify-content-between">
                     <a href="{{ route('usuarios.index') }}" class="btn btn-outline-secondary px-4">↩ Cancelar</a>
                     <button type="submit" class="btn btn-success px-4">Crear Usuario</button>
