@@ -66,7 +66,6 @@ class UsuarioController extends Controller
             'is_loading' => ['nullable','boolean'],
         ]);
 
-        /* Campos editables */
         $usuario->name       = $request->name;
         $usuario->email      = $request->email;
         $usuario->is_active  = $request->boolean('is_active');
