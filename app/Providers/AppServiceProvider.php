@@ -7,6 +7,8 @@ use Laravel\Sanctum\Sanctum;
 use App\Models\PersonalAccessToken;
 use Illuminate\Support\Facades\Auth;
 use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
+use Illuminate\Notifications\Notification;
+use App\Models\DatabaseNotification;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,9 +29,15 @@ class AppServiceProvider extends ServiceProvider
             }
 
             $rol = strtolower(trim($user->rol_id));
-
-            /************** MENU ADMIN **************/
+/*************************************menu de admin***************************** */
             if ($rol === 'admin') {
+                // Menú de ADMIN
+               /* $event->menu->add([
+                    'text' => 'Dashboard',
+                    'icon' => 'fas fa-home',
+                    'url'  => 'admin/dashboard',
+                ]);
+               */
                 $event->menu->add([
                     'text' => 'Citas Programadas',
                     'icon' => 'fas fa-calendar-alt',
@@ -148,9 +156,11 @@ class AppServiceProvider extends ServiceProvider
                     ],
                 ]);
             }
-
-            /************** MENU MODERADOR **************/
+/*******************************************menu de gestor************************************************ */
             if ($rol === 'moderador') {
+                // Menú de MODERADOR
+               
+
                 $event->menu->add([
                     'text' => 'Citas Programadas',
                     'icon' => 'fas fa-calendar-alt',
@@ -164,7 +174,7 @@ class AppServiceProvider extends ServiceProvider
                 ]);
 
                 $event->menu->add([
-                    'text' => 'Proyectos asignados',
+                    'text' => 'proyectos asiganado',
                     'icon' => 'fas fa-folder',
                     'url'  => 'gestor/asignados',
                 ]);
@@ -200,20 +210,20 @@ class AppServiceProvider extends ServiceProvider
                 ]);
             }
 
-            /************** TOPNAV NOTIFICACIONES Y PERFIL **************/
+            // TOPNAV
             $notificacionesNoLeidas = \App\Models\NotificacionPersonalizada::where('user_id', $user->_id)
                 ->where('leida', false)
                 ->count();
-
             $event->menu->add([
-                'type'          => 'navbar-notification',
-                'id'            => 'notificaciones',
-                'icon'          => 'fas fa-bell',
-                'url'           => 'notificaciones',
-                'topnav_right'  => true,
-                'label'         => $notificacionesNoLeidas > 0 ? $notificacionesNoLeidas : null,
-                'dropdown_mode' => false,
+             'type'          => 'navbar-notification',
+             'id'            => 'notificaciones',
+             'icon'          => 'fas fa-bell',
+             'url'           => 'notificaciones', // Ruta a tu página de notificaciones
+             'topnav_right'  => true,
+             'label'         => $notificacionesNoLeidas > 0 ? $notificacionesNoLeidas : null, // Muestra el contador
+             'dropdown_mode' => false, // No mostrar el menú desplegable
             ]);
+
 
             $event->menu->add([
                 'type'         => 'navbar-item',
