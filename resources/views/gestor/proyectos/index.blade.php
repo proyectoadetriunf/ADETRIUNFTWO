@@ -7,7 +7,7 @@
     <h1>🗂️ Gestión de Proyectos</h1>
 
     <!-- Navegación -->
-    <ul class="nav nav-tabs" role="tablist">
+    <ul class="nav nav-tabs mt-3" role="tablist">
         <li class="nav-item">
             <a class="nav-link {{ $tab === 'ver' ? 'active' : '' }}" href="{{ route('gestor.proyectos.index', ['tab' => 'ver']) }}">📄 Ver Proyectos</a>
         </li>
@@ -16,9 +16,6 @@
         </li>
         <li class="nav-item">
             <a class="nav-link {{ $tab === 'asignar' ? 'active' : '' }}" href="{{ route('gestor.proyectos.index', ['tab' => 'asignar']) }}">✅ Asignar Proyecto</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ $tab === 'seguimiento' ? 'active' : '' }}" href="{{ route('gestor.proyectos.index', ['tab' => 'seguimiento']) }}">📊 Seguimiento</a>
         </li>
     </ul>
 
@@ -32,7 +29,9 @@
                             <th>Nombre</th>
                             <th>Descripción</th>
                             <th>Año</th>
+                            <th>Costo</th>
                             <th>Estado</th>
+                            <th>Asignado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -42,13 +41,26 @@
                                 <td>{{ $proyecto['nombre'] }}</td>
                                 <td>{{ $proyecto['descripcion'] }}</td>
                                 <td>{{ $proyecto['anio'] }}</td>
+                                <td>L. {{ number_format($proyecto['costo'] ?? 0, 2) }}</td>
                                 <td>{{ $proyecto['estado'] }}</td>
+                                <td class="text-center">
+                                    @if(in_array($proyecto['_id'], $proyectosAsignadosIds))
+                                        <span class="text-success">✔️</span>
+                                    @else
+                                        <span class="text-danger">❌</span>
+                                    @endif
+                                </td>
                                 <td>
-                                    <a href="{{ route('gestor.proyectos.index', ['tab' => 'seguimiento', 'id' => $proyecto['_id'] ?? '']) }}" class="btn btn-sm btn-info">Ver Seguimiento</a>
+                                    <a href="{{ route('gestor.proyectos.editar', ['id' => $proyecto['_id']]) }}" class="btn btn-sm btn-warning">Editar</a>
+                                    <form action="{{ route('gestor.proyectos.eliminar', ['id' => $proyecto['_id']]) }}" method="POST" style="display:inline-block">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar este proyecto?')">Eliminar</button>
+                                    </form>
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="text-center">No hay proyectos registrados.</td></tr>
+                            <tr><td colspan="7" class="text-center">No hay proyectos registrados.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -70,6 +82,10 @@
                 <div class="form-group">
                     <label>Año de Ejecución</label>
                     <input type="number" class="form-control" name="anio" required>
+                </div>
+                <div class="form-group">
+                    <label>Costo del Proyecto</label>
+                    <input type="number" class="form-control" name="costo" step="0.01" required>
                 </div>
                 <div class="form-group">
                     <label>Estado</label>
@@ -143,60 +159,6 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
-
-        <!-- Seguimiento -->
-        <div class="tab-pane fade {{ $tab === 'seguimiento' ? 'show active' : '' }}" id="seguimiento" role="tabpanel">
-            @if(isset($proyectoSeleccionado))
-                <h3>📊 Seguimiento del Proyecto: {{ $proyectoSeleccionado['nombre'] }}</h3>
-
-                @php
-                    $total = 0;
-                    foreach ($seguimientos as $s) {
-                        $total += $s['avance'] ?? 0;
-                    }
-                    $claseColor = 'info';
-                    if ($total >= 100) {
-                        $claseColor = 'success';
-                    } elseif ($total >= 50) {
-                        $claseColor = 'warning';
-                    } else {
-                        $claseColor = 'danger';
-                    }
-                @endphp
-
-                <div class="alert alert-{{ $claseColor }}">
-                    <strong>Progreso Total del Proyecto:</strong> {{ $total }}%
-                    @if($total >= 100)
-                        <br><span class="font-weight-bold text-success">¡Proyecto Finalizado!</span>
-                    @endif
-                </div>
-
-                @if(!empty($seguimientos) && is_array($seguimientos) && count($seguimientos) > 0)
-                    <table class="table table-bordered mt-3">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Avance (%)</th>
-                                <th>Comentario</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($seguimientos as $seg)
-                                <tr>
-                                    <td>{{ $seg['fecha'] ?? '' }}</td>
-                                    <td>{{ $seg['avance'] ?? 0 }}%</td>
-                                    <td>{{ $seg['comentario'] ?? '' }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @else
-                    <div class="alert alert-warning">Este proyecto no tiene seguimientos registrados.</div>
-                @endif
-            @else
-                <div class="alert alert-info">Seleccione un proyecto desde la pestaña "Ver Proyectos" para ver su seguimiento.</div>
-            @endif
         </div>
     </div>
 </div>

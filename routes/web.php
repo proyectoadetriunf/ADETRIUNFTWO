@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\BeneficiarioController;
+//use App\Http\Controllers\BeneficiarioController;
 use App\Http\Controllers\AvanceController;
 use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\SolicitudController;
@@ -45,10 +45,108 @@ Route::prefix('gestor/proyectos')->name('gestor.proyectos.')->group(function() {
     Route::post('/evidencias/guardar', [ProyectoController::class, 'guardarEvidencia'])->name('evidencias.guardar');
 });
 
+Route::prefix('gestor/proyectos')->group(function () {
+    Route::get('/', [ProyectoController::class, 'index'])->name('gestor.proyectos.index');
+    Route::post('/store', [ProyectoController::class, 'store'])->name('gestor.proyectos.store');
+    Route::post('/asignar', [ProyectoController::class, 'asignar'])->name('gestor.proyectos.asignar');
 
+    // ✅ NUEVAS RUTAS PARA EDITAR Y ELIMINAR
+    Route::get('/editar/{id}', [ProyectoController::class, 'editar'])->name('gestor.proyectos.editar');
+    Route::put('/actualizar/{id}', [ProyectoController::class, 'actualizar'])->name('gestor.proyectos.actualizar');
+    Route::delete('/eliminar/{id}', [ProyectoController::class, 'eliminar'])->name('gestor.proyectos.eliminar');
+});
+Route::get('gestor/proyectos/editar/{id}', [ProyectoController::class, 'editar'])->name('gestor.proyectos.editar');
+Route::put('gestor/proyectos/actualizar/{id}', [ProyectoController::class, 'actualizar'])->name('gestor.proyectos.actualizar');
+Route::delete('gestor/proyectos/eliminar/{id}', [ProyectoController::class, 'eliminar'])->name('gestor.proyectos.eliminar');
+Route::post('gestor/proyectos/asignar', [ProyectoController::class, 'asignar'])->name('gestor.proyectos.asignar');
+Route::put('gestor/proyectos/{id}/actualizar', [ProyectoController::class, 'actualizar'])->name('gestor.proyectos.actualizar');
+use App\Http\Controllers\Gestor\CronogramaController;
+
+Route::prefix('gestor/proyectos')->middleware(['auth'])->group(function () {
+    Route::get('cronograma/{proyecto_id}', [CronogramaController::class, 'index'])->name('gestor.proyectos.cronograma');
+    Route::post('cronograma/store', [CronogramaController::class, 'store'])->name('gestor.proyectos.cronograma.store');
+    Route::post('cronograma/finalizar/{actividad_id}', [CronogramaController::class, 'finalizar'])->name('gestor.proyectos.cronograma.finalizar');
+});
+Route::get('gestor/asignados', [ProyectoController::class, 'asignados'])->name('gestor.asignados');
+Route::get('gestor/asignados/cronograma/{id}', [ProyectoController::class, 'cronograma'])->name('gestor.cronograma');
+Route::get('gestor/asignados/avances/{id}', [ProyectoController::class, 'avances'])->name('gestor.avances');
+Route::get('gestor/asignados', [ProyectoController::class, 'asignados'])->name('gestor.proyectos.asignados');
+Route::get('gestor/asignados/{id}/cronograma', [ProyectoController::class, 'cronograma'])->name('gestor.proyectos.cronograma');
+Route::get('gestor/asignados/{id}/avances', [ProyectoController::class, 'avances'])->name('gestor.proyectos.avances');
+Route::get('gestor/asignados/cronograma/{id}', [ProyectoController::class, 'cronograma'])->name('gestor.proyectos.cronograma');
+Route::post('gestor/proyectos/cronograma/finalizar/{id}', [ProyectoController::class, 'finalizarActividad'])->name('gestor.proyectos.cronograma.finalizar');
+Route::post('/gestor/proyectos/avances/guardar', [ProyectoController::class, 'guardarAvance'])
+     ->name('gestor.proyectos.avances.guardar');
+
+Route::post('gestor/proyectos/avances/store', [ProyectoController::class, 'guardarAvance'])->name('gestor.proyectos.avances.store');
+
+Route::post('gestor/proyectos/avances/guardar', [ProyectoController::class, 'guardarAvance'])->name('gestor.proyectos.avances.store');
+Route::post('/gestor/proyectos/avances/guardar', [ProyectoController::class, 'guardarAvance'])
+    ->name('gestor.proyectos.avances.store');
+Route::get('gestor/proyectos/avances/{id}', [ProyectoController::class, 'avances'])->name('gestor.proyectos.avances');
+Route::post('/gestor/proyectos/avances/guardar', [App\Http\Controllers\Gestor\ProyectoController::class, 'guardarAvance'])
+    ->name('gestor.proyectos.avances.guardar');
+Route::get('gestor/asignados/cronograma/{id}', [App\Http\Controllers\Gestor\ProyectoController::class, 'cronograma'])
+    ->name('gestor.cronograma');
+Route::post('/gestor/proyectos/progreso/{id}', [App\Http\Controllers\Gestor\ProyectoController::class, 'actualizarProgreso'])
+    ->name('gestor.proyectos.actualizarProgreso');
+
+Route::get('/gestor/proyectos/avances/exportar-word/{id}', [ProyectoController::class, 'exportarWord'])->name('gestor.proyectos.exportarWord');
+Route::get('/gestor/proyectos/avances/exportar-excel/{id}', [ProyectoController::class, 'exportarExcel'])->name('gestor.proyectos.exportarExcel');
+
+
+Route::get('/beneficiarios', [\App\Http\Controllers\Gestor\BenelisController::class, 'index'])->name('beneficiarios.index');
+Route::get('/beneficiarios', [BenelisController::class, 'index'])->name('beneficiarios.index');
+Route::get('/beneficiarios', [BenelisController::class, 'index'])->name('beneficiarios.index');
+use App\Http\Controllers\Gestor\BenelisController;
+
+Route::get('/beneficiarios', [BenelisController::class, 'index'])->name('beneficiarios.index');
+Route::get('/beneficiarios/proyectos-asignados', [App\Http\Controllers\Gestor\BenelisController::class, 'proyectosAsignados'])
+    ->name('beneficiarios.proyectos.asignados');
+Route::get('/beneficiarios/seleccionar-proyecto', [BenelisController::class, 'seleccionarProyecto'])->name('beneficiarios.seleccionar');
+Route::get('/beneficiarios/registrar/{proyecto_id}', [BenelisController::class, 'formulario'])->name('beneficiarios.registrar');
+Route::get('beneficiarios/seleccionar', [BenelisController::class, 'seleccionarProyecto'])->name('beneficiarios.seleccionar');
+Route::get('beneficiarios/formulario/{proyecto_id}', [BenelisController::class, 'formulario'])->name('beneficiarios.formulario');
+
+// Mostrar proyectos asignados para registrar beneficiario
+Route::get('beneficiarios/seleccionar-proyecto', [BenelisController::class, 'seleccionarProyecto'])->name('beneficiarios.seleccionar');
+
+// Mostrar formulario de registro con el proyecto ya seleccionado
+Route::get('beneficiarios/formulario/{proyecto_id}', [BenelisController::class, 'formulario'])->name('beneficiarios.formulario');
+
+// Guardar beneficiario (esto ya lo debes tener, solo por si acaso)
+Route::post('beneficiarios/store', [BenelisController::class, 'store'])->name('beneficiarios.store');
+Route::get('beneficiarios/proyectos-asignados', [BenelisController::class, 'proyectosAsignados'])->name('beneficiarios.proyectos.asignados');
 
 /***********************************************************************/
+Route::get('/beneficiarios', [App\Http\Controllers\Gestor\BenelisController::class, 'mostrarProyectosAsignados'])->name('beneficiarios.index');
+Route::post('/beneficiarios/guardar', [BeneficiarioController::class, 'store'])->name('beneficiarios.guardar');
+Route::get('/beneficiarios', [BeneficiarioController::class, 'index'])->name('beneficiarios.index');
+Route::get('/beneficiarios/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
+Route::post('/beneficiarios/guardar', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.guardar');
+// AJAX para cargar municipios y colonias
+Route::get('/beneficiarios/municipios/{id}', [BeneficiarioController::class, 'obtenerMunicipios']);
+Route::get('/beneficiarios/colonias/{id}', [BeneficiarioController::class, 'obtenerColonias']);
+Route::get('/beneficiarios/registrar/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.registrar');
+Route::get('gestor/beneficiarios/formulario/{proyecto_id}', [BenelisController::class, 'formulario'])->name('gestor.beneficiarios.formulario');
+Route::get('/beneficiarios/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
+Route::post('/beneficiarios/guardar', [BeneficiarioController::class, 'store'])->name('beneficiarios.store');
+Route::get('/beneficiarios/municipios/{id}', [BeneficiarioController::class, 'obtenerMunicipios']);
+Route::get('/beneficiarios/colonias/{id}', [BeneficiarioController::class, 'obtenerColonias']);
+Route::prefix('gestor/beneficiarios')->middleware('auth')->group(function () {
+    Route::get('seleccionar', [BenelisController::class, 'seleccionarProyecto'])->name('gestor.beneficiarios.seleccionarProyecto');
+    Route::get('formulario/{id}', [BenelisController::class, 'formulario'])->name('gestor.beneficiarios.formulario');
+});
+Route::get('gestor/beneficiarios/formulario/{proyecto_id}', [BenelisController::class, 'formulario'])->name('gestor.beneficiarios.formulario');
 
+Route::prefix('beneficiarios')->middleware(['auth'])->group(function () {
+    Route::get('/', [BeneficiarioController::class, 'index'])->name('beneficiarios.index');
+    Route::get('/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
+    Route::post('/guardar', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.guardar');
+});
+
+Route::get('/beneficiarios', [BenelisController::class, 'index'])->name('beneficiarios.index');
+Route::get('/beneficiarios/proyectos-asignados', [BenelisController::class, 'proyectosAsignados'])->name('beneficiarios.proyectos.asignados');
 /**********************************Salon******************************** */
 // Rutas de gestión del salón
 Route::prefix('gestor/salon')->middleware(['auth'])->group(function () {
@@ -57,6 +155,28 @@ Route::prefix('gestor/salon')->middleware(['auth'])->group(function () {
 });
 
 
+
+
+/*********************************************************************** */
+/**********************************solicitudes******************************** */
+// Rutas de gestión del salón
+Route::get('crear/solicitud', [SolicitudController::class, 'create'])->name('solicitudes.create');
+Route::post('crear/solicitud', [SolicitudController::class, 'store'])->name('solicitudes.store');
+Route::get('mostrar/solicitudes', [SolicitudController::class, 'mostrar'])->name('solicitudes.mostrar');
+Route::post('solicitudes/aceptar/{id}', [SolicitudController::class, 'aceptar'])->name('solicitudes.aceptar');
+Route::post('solicitudes/rechazar/{id}', [SolicitudController::class, 'rechazar'])->name('solicitudes.rechazar');
+Route::get('solicitudes/exportar', [SolicitudController::class, 'exportar'])->name('solicitudes.exportar');
+Route::get('solicitudes/exportar/pdf/{estado}', [SolicitudController::class, 'exportarPdf'])->name('solicitudes.exportar.pdf');
+Route::get('solicitudes/exportar/word/{estado}', [SolicitudController::class, 'exportarWord'])->name('solicitudes.exportar.word');
+Route::get('mostrar/solicitudes', [SolicitudController::class, 'mostrar'])->name('solicitudes.mostrar');
+Route::get('/solicitudes/exportar/pdf/{estado}', [SolicitudController::class, 'exportarPdf'])->name('solicitudes.exportar.pdf');
+Route::get('solicitudes/exportar/word/{estado}', [SolicitudController::class, 'exportarWord'])->name('solicitudes.exportar.word');
+Route::get('solicitudes/exportar/pdf/{estado}', [SolicitudController::class, 'exportarPdf'])->name('solicitudes.exportar.pdf');
+Route::get('solicitudes/exportar/excel/{estado}', [SolicitudController::class, 'exportarExcel'])->name('solicitudes.exportar.excel');
+Route::get('solicitudes/exportar/pdf/{estado}', [SolicitudController::class, 'exportarPdf'])->name('solicitudes.exportar.pdf');
+Route::get('solicitudes/exportar-html/{estado}', [SolicitudController::class, 'exportarHtml'])->name('solicitudes.exportar.html');
+Route::get('solicitudes/exportar-word/{estado}', [SolicitudController::class, 'exportarWord'])->name('solicitudes.exportar.word');
+Route::get('solicitudes/exportar', [SolicitudController::class, 'exportar'])->name('solicitudes.exportar');
 
 
 /*********************************************************************** */
@@ -241,3 +361,48 @@ Route::get('/test-email', function () {
     return '✅ Correo de recuperación enviado correctamente.';
 });
 
+use App\Http\Controllers\Gestor\BeneficiarioController;
+
+Route::prefix('beneficiarios')->middleware(['auth'])->group(function () {
+    Route::get('/', [BeneficiarioController::class, 'index'])->name('beneficiarios.index');
+    Route::get('/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
+    Route::post('/guardar', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.guardar');
+
+    // Para selects dependientes si los usas
+    Route::get('/municipios/{departamento_id}', [BeneficiarioController::class, 'obtenerMunicipios'])->name('beneficiarios.municipios');
+    Route::get('/colonias/{municipio_id}', [BeneficiarioController::class, 'obtenerColonias'])->name('beneficiarios.colonias');
+});
+
+Route::prefix('beneficiarios')->middleware(['auth'])->group(function () {
+    Route::get('/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
+});
+
+Route::prefix('beneficiarios')->middleware('auth')->group(function () {
+    Route::get('/', [BeneficiarioController::class, 'index'])->name('beneficiarios.index');
+    Route::get('/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
+    Route::post('/guardar', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.guardar');
+});
+Route::get('/beneficiarios/municipios/{departamento}', [BeneficiarioController::class, 'obtenerMunicipios'])->name('beneficiarios.municipios');
+Route::get('/beneficiarios/colonias/{municipio}', [BeneficiarioController::class, 'obtenerColonias'])->name('beneficiarios.colonias');
+Route::get('/beneficiarios/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
+Route::get('/beneficiarios/formulario/{id}', [BeneficiarioController::class, 'formulario']);
+Route::post('/beneficiarios', [BeneficiarioController::class, 'store'])->name('beneficiarios.store');
+// Beneficiarios
+Route::get('/beneficiarios', [BeneficiarioController::class, 'index'])->name('beneficiarios.index');
+Route::get('/beneficiarios/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario']);
+Route::post('/beneficiarios', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.store');
+
+// API para selects dependientes
+Route::get('/api/municipios/{departamento_id}', [BeneficiarioController::class, 'obtenerMunicipios']);
+Route::get('/api/colonias/{municipio_id}', [BeneficiarioController::class, 'obtenerColonias']);
+
+Route::get('/beneficiarios/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario']);
+
+Route::prefix('beneficiarios')->group(function () {
+    Route::get('/', [BeneficiarioController::class, 'index'])->name('beneficiarios.index');
+    Route::get('/formulario/{id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
+    Route::post('/guardar', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.store');
+});
+
+Route::get('/api/municipios/{departamentoId}', [BeneficiarioController::class, 'obtenerMunicipios']);
+Route::get('/api/colonias/{municipioId}', [BeneficiarioController::class, 'obtenerColonias']);

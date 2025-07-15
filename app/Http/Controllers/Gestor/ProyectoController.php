@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Gestor;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use MongoDB\BSON\ObjectId;
 
 class ProyectoController extends Controller
@@ -12,278 +13,246 @@ class ProyectoController extends Controller
     public function index(Request $request)
     {
         $proyectosRaw = DB::connection('mongodb')->collection('proyectos')->get();
+        $proyectosIds = $proyectosRaw->pluck('_id')->map(fn($id) => (string) $id)->toArray();
 
         $proyectos = $proyectosRaw->map(function ($item) {
             return [
-                '_id'           => (string) ($item['_id'] ?? ''),
-                'nombre'        => $item['nombre'] ?? '',
-                'descripcion'   => $item['descripcion'] ?? '',
-                'anio'          => $item['anio'] ?? '',
-                'estado'        => $item['estado'] ?? '',
-                'seguimientos'  => $item['seguimientos'] ?? [],
-                'evidencias'    => $item['evidencias'] ?? [],
+                '_id' => (string) ($item['_id'] ?? ''),
+                'nombre' => $item['nombre'] ?? '',
+                'descripcion' => $item['descripcion'] ?? '',
+                'anio' => $item['anio'] ?? '',
+                'costo' => $item['costo'] ?? 0,
+                'estado' => $item['estado'] ?? 'Aprobado',
+                'seguimientos' => $item['seguimientos'] ?? [],
+                'evidencias' => $item['evidencias'] ?? [],
+                'gasto_total' => $item['gasto_total'] ?? 0,
+                'progreso' => $item['progreso'] ?? 0,
             ];
         });
 
-        $moderadoresRaw = DB::connection('mongodb')
-            ->collection('users')
-            ->where('rol_id', 'moderador')
-            ->get();
-
+        $moderadoresRaw = DB::connection('mongodb')->collection('users')->where('rol_id', 'moderador')->get();
         $moderadores = collect($moderadoresRaw)->map(function ($mod) {
             return [
-                '_id'   => (string) $mod['_id'],
-                'name'  => $mod['name'] ?? '',
+                '_id' => (string) $mod['_id'],
+                'name' => $mod['name'] ?? '',
                 'email' => $mod['email'] ?? '',
             ];
         });
 
         $asignacionesRaw = DB::connection('mongodb')->collection('asignaciones')->get();
-
         $proyectosAsignadosIds = $asignacionesRaw->pluck('proyecto_id')->map(fn($id) => (string) $id)->toArray();
 
         $asignaciones = $asignacionesRaw->map(function ($asig) use ($proyectos, $moderadores) {
-            $proyecto = $proyectos->firstWhere('_id', (string)$asig['proyecto_id']);
-            $moderador = $moderadores->firstWhere('_id', (string)$asig['moderador_id']);
-
+            $proyecto = $proyectos->firstWhere('_id', (string) $asig['proyecto_id']);
+            $moderador = $moderadores->firstWhere('_id', (string) $asig['moderador_id']);
             return [
-                'proyecto_nombre'   => $proyecto['nombre'] ?? 'Desconocido',
-                'moderador_nombre'  => $moderador['name'] ?? 'Desconocido',
-                'fecha_asignacion'  => $asig['fecha_asignacion'] ?? null,
+                'proyecto_nombre' => $proyecto['nombre'] ?? 'Desconocido',
+                'moderador_nombre' => $moderador['name'] ?? 'Desconocido',
+                'fecha_asignacion' => $asig['fecha_asignacion'] ?? null,
             ];
         });
 
         $proyectosNoAsignados = $proyectos->filter(fn($proy) => !in_array($proy['_id'], $proyectosAsignadosIds));
-
         $tab = $request->get('tab', 'crear');
-        $proyectoSeleccionado = null;
-        $seguimientos = [];
-
-        if ($tab === 'seguimiento' && $request->has('id')) {
-            $id = $request->get('id');
-            $proyecto = DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($id))->first();
-
-            if ($proyecto) {
-                $proyectoSeleccionado = [
-                    '_id'         => (string) $proyecto['_id'],
-                    'nombre'      => $proyecto['nombre'] ?? '',
-                    'descripcion' => $proyecto['descripcion'] ?? '',
-                    'anio'        => $proyecto['anio'] ?? '',
-                    'estado'      => $proyecto['estado'] ?? '',
-                ];
-
-                $seguimientos = $proyecto['seguimientos'] ?? [];
-            }
-        }
 
         return view('gestor.proyectos.index', compact(
             'proyectos',
             'proyectosNoAsignados',
             'tab',
-            'proyectoSeleccionado',
-            'seguimientos',
             'moderadores',
-            'asignaciones'
+            'asignaciones',
+            'proyectosAsignadosIds'
         ));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nombre'      => 'required|string|max:255',
+            'nombre' => 'required|string|max:255',
             'descripcion' => 'required|string',
-            'anio'        => 'required|integer|min:2000|max:2100',
-            'estado'      => 'required|in:Planificación,Aprobado'
+            'anio' => 'required|integer|min:2000|max:2100',
+            'estado' => 'required|string',
+            'costo' => 'required|numeric|min:0',
         ]);
 
         DB::connection('mongodb')->collection('proyectos')->insert([
-            'nombre'        => $request->nombre,
-            'descripcion'   => $request->descripcion,
-            'anio'          => (int) $request->anio,
-            'estado'        => $request->estado,
-            'created_at'    => now(),
-            'seguimientos'  => [],
-            'evidencias'    => []
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+            'anio' => (int) $request->anio,
+            'estado' => $request->estado,
+            'costo' => (float) $request->costo,
+            'seguimientos' => [],
+            'evidencias' => [],
+            'gasto_total' => 0,
+            'progreso' => 0,
+            'created_at' => now()
         ]);
 
-        return redirect()->route('gestor.proyectos.index', ['tab' => 'ver'])
-                         ->with('success', 'Proyecto creado correctamente.');
+        return redirect()->route('gestor.proyectos.index', ['tab' => 'ver'])->with('success', 'Proyecto guardado correctamente.');
     }
 
     public function asignar(Request $request)
     {
         $request->validate([
-            'proyecto_id'  => 'required',
-            'moderador_id' => 'required',
+            'proyecto_id' => 'required|string',
+            'moderador_id' => 'required|string',
         ]);
 
-        $existe = DB::connection('mongodb')->collection('asignaciones')
-            ->where('proyecto_id', new ObjectId($request->proyecto_id))
-            ->exists();
+        $existe = DB::connection('mongodb')->collection('asignaciones')->where([
+            'proyecto_id' => $request->proyecto_id,
+        ])->exists();
 
         if ($existe) {
-            return redirect()->route('gestor.proyectos.index', ['tab' => 'asignar'])
-                ->with('error', 'Este proyecto ya está asignado.');
+            return redirect()->route('gestor.proyectos.index', ['tab' => 'asignar'])->with('error', 'Este proyecto ya ha sido asignado.');
         }
 
         DB::connection('mongodb')->collection('asignaciones')->insert([
-            'proyecto_id'      => (string) $request->proyecto_id,
-            'moderador_id'     => (string) $request->moderador_id,
+            'proyecto_id' => $request->proyecto_id,
+            'moderador_id' => $request->moderador_id,
             'fecha_asignacion' => now(),
         ]);
 
-        $proyecto = DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($request->proyecto_id))->first();
-        $mensaje = 'Se te ha asignado el proyecto: ' . ($proyecto['nombre'] ?? 'Proyecto');
-
-        \App\Models\NotificacionPersonalizada::create([
-            'user_id' => $request->moderador_id,
-            'mensaje' => $mensaje,
-            'leida' => false,
-            'created_at' => now(),
+        DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($request->proyecto_id))->update([
+            'tecnico_asignado' => $request->moderador_id,
         ]);
 
-        return redirect()->route('gestor.proyectos.index', ['tab' => 'asignar'])
-                         ->with('success', 'Proyecto asignado correctamente.');
+        return redirect()->route('gestor.proyectos.index', ['tab' => 'asignar'])->with('success', 'Proyecto asignado correctamente.');
     }
 
-    public function agregarSeguimiento(Request $request, $id)
+    public function eliminar($id)
     {
-        $request->validate([
-            'avance'     => 'required|integer|min:0|max:100',
-            'comentario' => 'required|string|max:1000'
-        ]);
+        DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($id))->delete();
+        DB::connection('mongodb')->collection('asignaciones')->where('proyecto_id', new ObjectId($id))->delete();
 
-        $nuevoSeguimiento = [
-            'avance'     => $request->avance,
-            'comentario' => $request->comentario,
-            'fecha'      => now()->toDateTimeString()
-        ];
+        return redirect()->route('gestor.proyectos.index', ['tab' => 'ver'])->with('success', 'Proyecto y asignaciones eliminados.');
+    }
 
-        DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($id))
-            ->push('seguimientos', $nuevoSeguimiento);
-
+    public function editar($id)
+    {
         $proyecto = DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($id))->first();
-        $total = 0;
-        $count = 0;
 
-        foreach ($proyecto['seguimientos'] ?? [] as $s) {
-            $total += $s['avance'] ?? 0;
-            $count++;
+        if (!$proyecto) {
+            return redirect()->back()->with('error', 'Proyecto no encontrado.');
         }
 
-        $promedio = $count > 0 ? intval($total / $count) : 0;
-
-        if ($promedio >= 100) {
-            DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($id))
-                ->update(['estado' => 'Finalizado']);
-        }
-
-        return redirect()->route('gestor.proyectos.index', ['tab' => 'seguimiento', 'id' => $id])
-                         ->with('success', 'Seguimiento agregado correctamente.');
+        return view('gestor.proyectos.editar', compact('proyecto'));
     }
 
-    public function guardarEvidencia(Request $request)
+    public function actualizar(Request $request, $id)
     {
         $request->validate([
-            'proyecto_id' => 'required',
-            'archivo'     => 'required|file|mimes:pdf,jpg,jpeg,png,docx,xlsx',
-            'avance'      => 'required|integer|min:1|max:100',
-            'comentario'  => 'required|string|max:1000'
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'anio' => 'required|integer|min:2000|max:2100',
+            'estado' => 'required|string',
+            'costo' => 'required|numeric|min:0',
         ]);
 
-        $archivo = $request->file('archivo');
-        $nombreArchivo = time() . '_' . $archivo->getClientOriginalName();
-        $archivo->storeAs('public/evidencias', $nombreArchivo);
+        DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($id))->update([
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+            'anio' => (int) $request->anio,
+            'estado' => $request->estado,
+            'costo' => (float) $request->costo,
+        ]);
 
-        DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($request->proyecto_id))
-            ->push('evidencias', [
-                'archivo' => $nombreArchivo,
-                'comentario' => $request->comentario,
-                'fecha' => now()->toDateTimeString()
-            ]);
-
-        $this->agregarSeguimiento($request, $request->proyecto_id);
-
-        return redirect()->route('gestor.proyectos.index', ['tab' => 'evidencias'])
-                         ->with('success', 'Evidencia y avance guardados correctamente.');
+        return redirect()->route('gestor.proyectos.index', ['tab' => 'ver'])->with('success', 'Proyecto actualizado correctamente.');
     }
-
-    public function crear()       { return redirect()->route('gestor.proyectos.index', ['tab' => 'crear']); }
-    public function seguimiento() { return redirect()->route('gestor.proyectos.index', ['tab' => 'seguimiento']); }
-    public function evidencias()  { return redirect()->route('gestor.proyectos.index', ['tab' => 'evidencias']); }
 
     public function asignados()
     {
-        $user = auth()->user();
-        $asignaciones = DB::connection('mongodb')->collection('asignaciones')
-            ->where('moderador_id', (string) $user->_id)
+        $userId = auth()->id();
+
+        $asignaciones = DB::connection('mongodb')->collection('asignaciones')->where('moderador_id', $userId)->get();
+        $proyectosIds = $asignaciones->pluck('proyecto_id')->map(fn($id) => (string) $id)->toArray();
+
+        $proyectosRaw = DB::connection('mongodb')->collection('proyectos')
+            ->whereIn('_id', array_map(fn($id) => new ObjectId($id), $proyectosIds))
             ->get();
 
-        $proyectos = collect();
-        foreach ($asignaciones as $asig) {
-            $proy = DB::connection('mongodb')->collection('proyectos')->where('_id', $asig['proyecto_id'])->first();
-            if ($proy) {
-                $proy['_id'] = (string) $proy['_id'];
-                $proy['evidencias'] = $proy['evidencias'] ?? [];
-                $proyectos->push($proy);
-            }
-        }
+        $proyectosAsignados = $proyectosRaw->map(function ($item) {
+            return [
+                '_id' => (string) ($item['_id'] ?? ''),
+                'nombre' => $item['nombre'] ?? '',
+                'descripcion' => $item['descripcion'] ?? '',
+                'anio' => $item['anio'] ?? '',
+                'costo' => $item['costo'] ?? 0,
+                'estado' => $item['estado'] ?? 'Aprobado',
+                'progreso' => $item['progreso'] ?? 0,
+                'gasto_total' => $item['gasto_total'] ?? 0,
+            ];
+        });
 
-        return view('gestor.asignados', ['proyectos' => $proyectos]);
+        return view('gestor.asignados.index', compact('proyectosAsignados'));
     }
 
-    public function subirEvidencia(Request $request, $proyectoId)
+    public function cronograma($proyecto_id)
+    {
+        $proyecto = DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($proyecto_id))->first();
+
+        if (!$proyecto) {
+            return redirect()->back()->with('error', 'Proyecto no encontrado.');
+        }
+
+        $actividades = $proyecto['cronograma'] ?? [];
+
+        return view('gestor.asignados.cronograma', [
+            'proyecto' => $proyecto,
+            'proyecto_id' => $proyecto_id,
+            'actividades' => $actividades,
+        ]);
+    }
+
+    public function avances($id)
+    {
+        $proyecto = DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($id))->first();
+
+        if (!$proyecto) {
+            return redirect()->back()->with('error', 'Proyecto no encontrado.');
+        }
+
+        return view('gestor.asignados.avances', compact('proyecto'));
+    }
+
+    public function guardarAvance(Request $request)
     {
         $request->validate([
-            'evidencia' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png',
+            'proyecto_id' => 'required|string',
+            'descripcion' => 'required|string',
+            'monto_gasto' => 'nullable|numeric|min:0',
+            'imagen' => 'nullable|image|max:2048',
         ]);
 
-        $file = $request->file('evidencia');
-        $nombreOriginal = $file->getClientOriginalName();
-        $archivo = uniqid() . '_' . $nombreOriginal;
-        $file->storeAs('evidencias', $archivo);
+        $proyectoId = $request->proyecto_id;
 
-        $proyecto = DB::connection('mongodb')->collection('proyectos')->where('_id', $proyectoId);
-        $proy = $proyecto->first();
-        $evidencias = $proy['evidencias'] ?? [];
-
-        $evidencias[] = [
-            'nombre' => $nombreOriginal,
-            'archivo' => $archivo,
+        $avance = [
+            'descripcion' => $request->descripcion,
             'fecha' => now(),
+            'monto_gasto' => $request->monto_gasto ?? 0,
         ];
 
-        $proyecto->update(['evidencias' => $evidencias]);
+        if ($request->hasFile('imagen')) {
+            $path = $request->file('imagen')->store('public/evidencias');
+            $avance['imagen'] = $path;
+        }
 
-        return back()->with('success', 'Evidencia subida correctamente.');
+        DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($proyectoId))->push('evidencias', $avance);
+
+        DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($proyectoId))->increment('gasto_total', $avance['monto_gasto']);
+
+        return back()->with('success', 'Avance guardado correctamente.');
     }
 
-    public function descargarEvidencia($proyectoId, $archivo)
+    public function actualizarProgreso(Request $request, $id)
     {
-        $ruta = storage_path('app/evidencias/' . $archivo);
-        if (!file_exists($ruta)) {
-            abort(404);
-        }
-        return response()->download($ruta);
-    }
+        $progreso = (int) $request->input('progreso');
+        $estado = $progreso >= 100 ? 'Finalizado' : 'En Progreso';
 
-    public function eliminarEvidencia($proyectoId, $archivo)
-    {
-        $proyecto = DB::connection('mongodb')->collection('proyectos')->where('_id', $proyectoId);
-        $proy = $proyecto->first();
+        DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($id))->update([
+            'progreso' => $progreso,
+            'estado' => $estado,
+        ]);
 
-        if (!$proy) {
-            return back()->with('error', 'Proyecto no encontrado.');
-        }
-
-        $evidencias = array_filter($proy['evidencias'] ?? [], fn($ev) => $ev['archivo'] !== $archivo);
-        $proyecto->update(['evidencias' => array_values($evidencias)]);
-
-        $ruta = storage_path('app/evidencias/' . $archivo);
-        if (file_exists($ruta)) {
-            @unlink($ruta);
-        }
-
-        return back()->with('success', 'Evidencia eliminada correctamente.');
+        return back()->with('success', 'Progreso actualizado correctamente.');
     }
 }

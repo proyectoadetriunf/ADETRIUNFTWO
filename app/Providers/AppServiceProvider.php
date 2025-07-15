@@ -77,21 +77,21 @@ class AppServiceProvider extends ServiceProvider
                             'url'  => 'gestor/proyectos',
                         ],
                         [
-                            'text' => 'Registrar avance',
+                            'text' => 'Avances de Proyectos',
                             'icon' => 'fas fa-tasks',
-                            'url'  => '#',
+                            'url'  => 'mostrar/avance',
                             'id'   => 'abrirModalAvance',
                         ],
                         [
-                            'text' => 'Subir documentación',
+                            'text' => 'documentacion de proyectos',
                             'icon' => 'fas fa-upload',
-                            'url'  => '#',
+                            'url'  => 'documentos/admin',
                             'id'   => 'abrirModalDocumentacion',
                         ],
                         [
-                            'text' => 'Crear solicitud',
+                            'text' => 'Solicitudes',
                             'icon' => 'fas fa-paper-plane',
-                            'url'  => '#',
+                            'url'  => 'mostrar/solicitudes',
                             'id'   => 'abrirModalSolicitud',
                         ],
                     ],
@@ -107,12 +107,12 @@ class AppServiceProvider extends ServiceProvider
                             'url'  => 'beneficiarios',
                         ],
                         [
-                            'text' => 'Actividades / Tareas',
+                            'text' => 'Asignar Actividades / Tareas',
                             'icon' => 'fas fa-tasks',
                             'url'  => 'gestor/tareas',
                         ],
                         [
-                            'text' => 'Beneficiarios',
+                            'text' => 'lista de Beneficiarios',
                             'icon' => 'fas fa-users',
                             'url'  => 'gestor/beneficiarios',
                         ],
@@ -160,6 +160,7 @@ class AppServiceProvider extends ServiceProvider
             if ($rol === 'moderador') {
                 // Menú de MODERADOR
                
+                
 
                 $event->menu->add([
                     'text' => 'Citas Programadas',
@@ -172,7 +173,11 @@ class AppServiceProvider extends ServiceProvider
                     'icon' => 'fas fa-door-closed',
                     'url'  => 'gestor/salon',
                 ]);
-
+                $event->menu->add([
+                    'text' => 'crear solicitudes',
+                            'icon' => 'fas fa-paper-plane',
+                            'url'  => 'crear/solicitud',
+                ]);
                 $event->menu->add([
                     'text' => 'proyectos asiganado',
                     'icon' => 'fas fa-folder',
@@ -186,9 +191,9 @@ class AppServiceProvider extends ServiceProvider
                 ]);
 
                 $event->menu->add([
-                    'text' => 'Actividades / Tareas',
+                    'text' => 'Actividades/Tareas Asignadas',
                     'icon' => 'fas fa-tasks',
-                    'url'  => 'gestor/tareas',
+                    'url'  => 'tares asignadas',
                 ]);
 
                 $event->menu->add([
@@ -208,6 +213,18 @@ class AppServiceProvider extends ServiceProvider
                     'icon' => 'fas fa-chart-bar',
                     'url'  => 'gestor/dashboard',
                 ]);
+                 $event->menu->add([
+                    'text' => 'Resumen General',
+                    'icon' => 'fas fa-chart-bar',
+                    'url'  => 'gestor/dashboard',
+                ]);
+                  $event->menu->add([
+                    'text' => 'Resumen General',
+                    'icon' => 'fas fa-chart-bar',
+                    'url'  => 'gestor/dashboard',
+                ]);
+                
+                
             }
 
             // TOPNAV
