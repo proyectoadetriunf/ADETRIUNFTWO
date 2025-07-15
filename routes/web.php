@@ -9,6 +9,8 @@ use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\Admin\ReporteController;
+
 
 use App\Http\Controllers\Admin\UsuarioController;
 
@@ -199,10 +201,14 @@ Route::middleware(['auth', 'adminonly'])->prefix('admin')->group(function () {
     Route::get('/roles', [App\Http\Controllers\Admin\RolController::class, 'index'])->name('admin.roles');
     Route::post('/roles/asignar', [App\Http\Controllers\Admin\RolController::class, 'asignar'])->name('admin.roles.asignar');
 
-    // 📊 Reportes
+    // 📊 Reportes de avances
     Route::get('/reportes/avances', [App\Http\Controllers\Admin\ReporteController::class, 'avances'])->name('admin.reportes.avances');
     Route::get('/reportes/financieros', [App\Http\Controllers\Admin\ReporteController::class, 'financieros'])->name('admin.reportes.financieros');
     Route::get('/reportes/comunidades', [App\Http\Controllers\Admin\ReporteController::class, 'comunidades'])->name('admin.reportes.comunidades');
+    
+
+
+
 
     // 📅 Citas
     Route::get('/citas', [App\Http\Controllers\Admin\CitaController::class, 'index'])->name('admin.citas');
