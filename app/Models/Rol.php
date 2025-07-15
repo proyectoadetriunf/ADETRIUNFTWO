@@ -19,3 +19,4 @@ class Rol extends Model
     
 }
 
+

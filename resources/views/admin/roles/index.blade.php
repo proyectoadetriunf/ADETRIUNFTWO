@@ -83,8 +83,9 @@
                             <td>{{ $usuario->email }}</td>
                             <td>
                                 @php
-                                    $rol = $roles->firstWhere('rol_id', $usuario->rol_id);
-                                @endphp
+    $rol = $roles->firstWhere('rol_id', $usuario->rol_id);
+@endphp
+
                                 @if($rol)
                                     <span class="badge badge-info">{{ $rol->nombre }}</span>
                                 @else
