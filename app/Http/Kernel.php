@@ -73,6 +73,7 @@ class Kernel extends HttpKernel
         'adminOTecnicoOnly' => \App\Http\Middleware\AdminOTecnicoOnly::class,
         'adminonly' => \App\Http\Middleware\AdminOnly::class,
         'gestor' => \App\Http\Middleware\GestorMiddleware::class,
+        'check.page.active' => \App\Http\Middleware\CheckPageActive::class,
 
 
 

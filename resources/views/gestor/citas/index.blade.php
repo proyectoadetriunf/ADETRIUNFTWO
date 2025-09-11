@@ -1,71 +1,96 @@
 @extends('adminlte::page')
 
-@section('title', 'Gestión de Citas')
-
-@php
-    $tab = $tab ?? 'programadas';
-@endphp
+@section('title', '📅 Agenda y Gestión de Citas')
 
 @section('content')
-<div class="container">
-    <h1>📋 Gestión de Citas</h1>
-
-    <!-- Navegación -->
-    <ul class="nav nav-tabs mt-3">
-        <li class="nav-item">
-            <a class="nav-link {{ $tab === 'programadas' ? 'active' : '' }}" href="{{ route('gestor.citas.index', ['tab' => 'programadas']) }}">
-                📅 Citas Programadas
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ $tab === 'agendar' ? 'active' : '' }}" href="{{ route('gestor.citas.index', ['tab' => 'agendar']) }}">
-                📝 Agendar Cita
-            </a>
-        </li>
-    </ul>
-
-    <div class="tab-content mt-4">
+<div class="container-fluid">
+    <div class="row mb-4">
         <!-- Calendario -->
-        <div class="tab-pane fade {{ $tab === 'programadas' ? 'show active' : '' }}" id="programadas" role="tabpanel">
-            <div class="card p-3">
-                <div id="calendar"></div>
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">📅 Citas en Calendario</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="calendar"></div>
+                </div>
             </div>
         </div>
 
-        <!-- Agendar nueva cita -->
-        <div class="tab-pane fade {{ $tab === 'agendar' ? 'show active' : '' }}" id="agendar" role="tabpanel">
-            <form action="{{ route('gestor.citas.guardar') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="form-group">
-                    <label>Nombre del Proyecto</label>
-                    <select name="proyecto_id" class="form-control" required>
-                        <option value="">Seleccione un proyecto</option>
-                        @foreach($proyectos as $proyecto)
-                            <option value="{{ $proyecto['_id'] }}">{{ $proyecto['nombre'] ?? 'Proyecto sin nombre' }}</option>
-                        @endforeach
-                    </select>
+        <!-- Formulario de nueva cita -->
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">📝 Agendar Nueva Cita</h5>
                 </div>
-                <div class="form-group mt-3">
-                    <label>Fecha de la Cita</label>
-                    <input type="date" class="form-control" name="fecha" required>
+                <div class="card-body">
+                    <form action="{{ route('gestor.citas.guardar') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="form-group">
+                            <label>Fecha de la Cita</label>
+                            <input type="date" class="form-control" name="fecha" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Motivo</label>
+                            <textarea name="motivo" rows="3" class="form-control" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Adjuntar Evidencia (opcional)</label>
+                            <input type="file" name="archivo" class="form-control-file">
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block mt-3">📥 Guardar Cita</button>
+                    </form>
                 </div>
-                <div class="form-group mt-3">
-                    <label>Motivo</label>
-                    <textarea class="form-control" name="motivo" rows="3" required></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📋 Historial de Citas</h5>
                 </div>
-                <div class="form-group mt-3">
-                    <label>Archivo Evidencia (opcional)</label>
-                    <input type="file" class="form-control-file" name="archivo">
+                <div class="card-body table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Motivo</th>
+                                <th>Registrado por</th>
+                                <th>Archivo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($citas as $cita)
+                                <tr>
+                                    <td>{{ \Carbon\Carbon::parse($cita['fecha'])->format('d/m/Y') }}</td>
+                                    <td>{{ $cita['motivo'] }}</td>
+                                    <td>{{ $cita['usuario'] ?? 'N/D' }}</td>
+                                    <td>
+                                        @if(isset($cita['archivo']))
+                                            <a href="{{ asset('storage/' . $cita['archivo']) }}" target="_blank" class="btn btn-sm btn-outline-secondary">📎 Ver Archivo</a>
+                                        @else
+                                            <span class="text-muted">No adjunto</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="4" class="text-center">No hay citas registradas.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Guardar Cita</button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- FullCalendar -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<!-- FullCalendar moderno con idioma español -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.global.min.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -73,11 +98,21 @@
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'es',
+            height: 'auto',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            buttonText: {
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día'
+            },
             events: @json($citasCalendar),
             eventClick: function(info) {
-                const proyectoId = info.event.id;
-                // Redirige a la vista de evidencias del proyecto
-                window.location.href = '/gestor/proyectos?tab=evidencias&proyecto_id=' + proyectoId;
+                alert('📌 ' + info.event.title + "\n🗓️ " + info.event.start.toLocaleDateString('es-ES') + "\n👤 Registrado por: " + (info.event.extendedProps.usuario || 'N/D'));
             }
         });
         calendar.render();

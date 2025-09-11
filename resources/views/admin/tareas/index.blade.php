@@ -16,7 +16,7 @@
             Registrar Nueva Tarea
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ route('gestor.tareas.guardar') }}">
+            <form method="POST" action="{{ route('admin.tareas.guardar') }}">
                 @csrf
                 <div class="form-group">
                     <label for="proyecto_id">Proyecto</label>
@@ -38,6 +38,15 @@
                 <div class="form-group">
                     <label for="etapa">Etapa</label>
                     <input type="text" class="form-control" name="etapa" required>
+                </div>
+                <div class="form-group">
+                    <label for="moderador_id">Moderador a asignar</label>
+                    <select class="form-control" name="moderador_id" required>
+                        <option value="">-- Seleccione un moderador --</option>
+                        @foreach($moderadores as $moderador)
+                            <option value="{{ $moderador['_id'] }}">{{ $moderador['name'] }} ({{ $moderador['rol_id'] == 2 ? 'Técnico' : 'Moderador' }})</option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="estado">Estado</label>
@@ -69,16 +78,20 @@
             @if(count($tareas) > 0)
                 <table class="table table-bordered table-striped">
                     <thead class="thead-dark">
-                        <tr>
-                            <th>Proyecto</th>
-                            <th>Título</th>
-                            <th>Etapa</th>
-                            <th>Descripción</th>
-                            <th>Estado</th>
-                            <th>Inicio</th>
-                            <th>Fin</th>
-                        </tr>
-                    </thead>
+    <tr>
+        <th>Proyecto</th>
+        <th>Título</th>
+        <th>Etapa</th>
+        <th>Descripción</th>
+        <th>Moderador</th>
+        <th>Estado</th>
+        <th>Inicio</th>
+        <th>Fin</th>
+        <th>Fecha/Hora Creación</th>
+        <th>Acciones</th>
+    </tr>
+</thead>
+
                     <tbody>
                         @foreach($tareas as $tarea)
                             <tr>
@@ -86,10 +99,34 @@
                                 <td>{{ $tarea['titulo'] }}</td>
                                 <td>{{ $tarea['etapa'] }}</td>
                                 <td>{{ $tarea['descripcion'] }}</td>
-                                <td>{{ $tarea['estado'] }}</td>
+                                <td>{{ $tarea['moderador'] ?? 'No asignado' }}</td>
+                                <td>
+                                    @if($tarea['estado'] === 'Pendiente')
+                                        <span class="badge badge-warning">{{ $tarea['estado'] }}</span>
+                                    @elseif($tarea['estado'] === 'En proceso')
+                                        <span class="badge badge-primary">{{ $tarea['estado'] }}</span>
+                                    @else
+                                        <span class="badge badge-success">{{ $tarea['estado'] }}</span>
+                                    @endif
+                                </td>
                                 <td>{{ $tarea['fecha_inicio'] }}</td>
                                 <td>{{ $tarea['fecha_fin'] }}</td>
+                                <td>
+                                    <small class="text-muted">
+                                        {{ $tarea['fecha_hora_creacion'] ?? 'No disponible' }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <form method="POST" action="{{ route('admin.tareas.eliminar', $tarea['_id']) }}" onsubmit="return confirm('¿Estás seguro de eliminar esta tarea?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash-alt"></i> Eliminar
+                                        </button>
+                                    </form>
+                                </td>
                             </tr>
+
                         @endforeach
                     </tbody>
                 </table>

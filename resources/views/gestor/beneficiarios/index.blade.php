@@ -1,84 +1,73 @@
 @extends('adminlte::page')
 
-@section('title', 'Agregar Beneficiario')
+@section('title', 'Beneficiarios por Proyecto')
 
 @section('content')
 <div class="container mt-4">
-    <h2><i class="fas fa-file-alt text-warning"></i> Agregar Beneficiario</h2>
+    <h1>🗂️ Beneficiarios por Proyecto</h1>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+    @foreach($proyectos as $proyecto)
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                    <span>📌 {{ $proyecto['nombre'] ?? 'Sin nombre' }}</span>
+                    <button class="btn btn-light btn-sm" onclick="toggleBeneficiarios('{{ $proyecto['_id'] }}')">
+                        👁️ Ver Beneficiarios
+                    </button>
+                </h5>
+            </div>
+            <div class="card-body" id="beneficiarios-{{ $proyecto['_id'] }}" style="display: none;">
+                @php
+                    $beneficiariosProyecto = $beneficiarios->filter(function ($b) use ($proyecto) {
+                        return isset($b['proyecto_id']) && (string) $b['proyecto_id'] === (string) $proyecto['_id'];
+                    });
+                @endphp
 
-    <table class="table table-bordered mt-3">
-        <thead class="thead-dark">
-            <tr>
-                <th>Nombre del Proyecto</th>
-                <th>Descripción</th>
-                <th>Año</th>
-                <th>Costo</th>
-                <th>Estado</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($proyectosAsignados as $proyecto)
-                <tr>
-                    <td>{{ $proyecto['nombre'] ?? 'Sin nombre' }}</td>
-                    <td>{{ $proyecto['descripcion'] ?? 'N/D' }}</td>
-                    <td>{{ $proyecto['anio'] ?? 'N/D' }}</td>
-                    <td>L. {{ number_format($proyecto['costo'] ?? 0, 2) }}</td>
-                    <td>{{ $proyecto['estado'] ?? 'N/D' }}</td>
-                    <td>
-                        <button class="btn btn-success" onclick="mostrarFormulario(this, '{{ $proyecto['_id'] }}')">
-                            <i class="fas fa-plus text-purple"></i> Agregar Beneficiarios
-                        </button>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" class="text-center">No hay proyectos asignados.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-
-    <!-- Formulario cargado dinámicamente -->
-    <div id="formulario-container" class="mt-4"></div>
+                @if($beneficiariosProyecto->isEmpty())
+                    <p>No hay beneficiarios registrados para este proyecto.</p>
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>DNI</th>
+                                    <th>Teléfono</th>
+                                    <th>Correo</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($beneficiariosProyecto as $item)
+                                    <tr>
+                                        <td>{{ $item['nombre'] }}</td>
+                                        <td>{{ $item['dni'] }}</td>
+                                        <td>{{ $item['telefono'] }}</td>
+                                        <td>{{ $item['correo'] }}</td>
+                                        <td>
+                                            <a href="{{ route('beneficiarios.encuesta', $item['_id']) }}" class="btn btn-success btn-sm">
+                                                📝 Encuesta
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endforeach
 </div>
-@endsection
 
-@section('js')
 <script>
-function mostrarFormulario(btn, proyectoId) {
-    // Desactiva el botón mientras carga
-    btn.disabled = true;
-    btn.innerHTML = 'Cargando...';
-
-    // Limpia el contenedor antes de insertar nuevo contenido
-    const contenedor = document.getElementById('formulario-container');
-    contenedor.innerHTML = '';
-
-    fetch(`/beneficiarios/formulario/${proyectoId}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error al obtener el formulario');
-            }
-            return response.text();
-        })
-        .then(html => {
-            contenedor.innerHTML = html;
-            contenedor.scrollIntoView({ behavior: 'smooth' });
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Ocurrió un error al cargar el formulario');
-        })
-        .finally(() => {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-plus text-purple"></i> Agregar Beneficiarios';
-        });
-}
+    function toggleBeneficiarios(id) {
+        const elem = document.getElementById('beneficiarios-' + id);
+        if (elem.style.display === 'none') {
+            elem.style.display = 'block';
+        } else {
+            elem.style.display = 'none';
+        }
+    }
 </script>
 @endsection
-x|

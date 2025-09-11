@@ -4,77 +4,58 @@ namespace App\Http\Controllers\Gestor;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use MongoDB\BSON\ObjectId;
 
 class TareaController extends Controller
 {
-    public function index()
+    public function misTareas()
     {
-        // Obtener todos los proyectos
+        $userId = Auth::user()->_id;
+
+        $tareasRaw = DB::connection('mongodb')->collection('tareas')
+            ->where('moderador_id', new ObjectId($userId))
+            ->where('estado', '!=', 'Completada')
+            ->get();
+
         $proyectos = DB::connection('mongodb')->collection('proyectos')->get();
 
-        // Obtener todas las tareas
-        $tareasRaw = DB::connection('mongodb')->collection('tareas')->get();
-
-        // Formatear tareas
-        $tareas = $tareasRaw->map(function ($item) use ($proyectos) {
-            $proyecto = $proyectos->first(function ($p) use ($item) {
-                return isset($p['_id']) && (string) $p['_id'] === (string) $item['proyecto_id'];
+        $tareas = $tareasRaw->map(function ($tarea) use ($proyectos) {
+            $proyecto = $proyectos->first(function ($p) use ($tarea) {
+                return (string) $p['_id'] === (string) $tarea['proyecto_id'];
             });
 
             return [
-                '_id'          => (string) $item['_id'],
+                '_id'          => (string) $tarea['_id'],
+                'titulo'       => $tarea['titulo'] ?? '',
+                'etapa'        => $tarea['etapa'] ?? '',
+                'estado'       => $tarea['estado'] ?? '',
+                'fecha_inicio' => $tarea['fecha_inicio'] ?? '',
+                'fecha_fin'    => $tarea['fecha_fin'] ?? '',
                 'proyecto'     => $proyecto['nombre'] ?? 'Desconocido',
-                'titulo'       => $item['titulo'] ?? '',
-                'descripcion'  => $item['descripcion'] ?? '',
-                'etapa'        => $item['etapa'] ?? '',
-                'estado'       => $item['estado'] ?? 'Pendiente',
-                'fecha_inicio' => $item['fecha_inicio'] ?? '',
-                'fecha_fin'    => $item['fecha_fin'] ?? '',
-                'created_at'   => $item['created_at'] ?? '',
             ];
         });
 
-        return view('gestor.tareas.index', compact('tareas', 'proyectos'));
+        return view('gestor.tareas.mis-tareas', compact('tareas'));
     }
 
-    public function guardar(Request $request)
+    public function finalizarTarea(Request $request, $id)
     {
         $request->validate([
-            'proyecto_id'  => 'required',
-            'titulo'       => 'required|string|max:255',
-            'descripcion'  => 'required|string',
-            'etapa'        => 'required|string',
-            'estado'       => 'required|in:Pendiente,En proceso,Completada',
-            'fecha_inicio' => 'required|date',
-            'fecha_fin'    => 'required|date|after_or_equal:fecha_inicio'
+            'evidencia' => 'required|file|max:2048'
         ]);
 
-        DB::connection('mongodb')->collection('tareas')->insert([
-            'proyecto_id'  => new ObjectId($request->proyecto_id),
-            'titulo'       => $request->titulo,
-            'descripcion'  => $request->descripcion,
-            'etapa'        => $request->etapa,
-            'estado'       => $request->estado,
-            'fecha_inicio' => $request->fecha_inicio,
-            'fecha_fin'    => $request->fecha_fin,
-            'created_at'   => now()
-        ]);
-
-        return redirect()->route('gestor.tareas.index')->with('success', 'Tarea registrada correctamente.');
-    }
-
-    public function completar(Request $request, $id)
-    {
-        $request->validate([
-            'estado' => 'required|in:Pendiente,En proceso,Completada'
-        ]);
+        $filePath = $request->file('evidencia')->store('evidencias', 'public');
 
         DB::connection('mongodb')->collection('tareas')
             ->where('_id', new ObjectId($id))
-            ->update(['estado' => $request->estado]);
+            ->update([
+                'estado' => 'Completada',
+                'evidencia' => $filePath,
+                'completada_at' => now()
+            ]);
 
-        return redirect()->route('gestor.tareas.index')->with('success', 'Estado actualizado.');
+        return back()->with('success', 'Tarea finalizada con éxito.');
     }
 }

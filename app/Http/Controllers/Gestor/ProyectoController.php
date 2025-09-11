@@ -237,7 +237,6 @@ class ProyectoController extends Controller
         }
 
         DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($proyectoId))->push('evidencias', $avance);
-
         DB::connection('mongodb')->collection('proyectos')->where('_id', new ObjectId($proyectoId))->increment('gasto_total', $avance['monto_gasto']);
 
         return back()->with('success', 'Avance guardado correctamente.');
@@ -255,4 +254,96 @@ class ProyectoController extends Controller
 
         return back()->with('success', 'Progreso actualizado correctamente.');
     }
+
+    public function exportarExcel($id)
+    {
+        $proyecto = DB::connection('mongodb')->collection('proyectos')->find(new ObjectId($id));
+
+        if (!$proyecto) {
+            return redirect()->back()->with('error', 'Proyecto no encontrado.');
+        }
+
+        $filename = 'proyecto_' . ($proyecto['nombre'] ?? 'desconocido') . '.csv';
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        $columns = ['Campo', 'Valor'];
+        $data = [
+            ['Nombre', $proyecto['nombre'] ?? ''],
+            ['Descripción', $proyecto['descripcion'] ?? ''],
+            ['Año', $proyecto['anio'] ?? ''],
+            ['Costo', $proyecto['costo'] ?? ''],
+            ['Estado', $proyecto['estado'] ?? ''],
+            ['Progreso', $proyecto['progreso'] . '%'],
+            ['Gasto Total', $proyecto['gasto_total'] ?? 0],
+            ['Cantidad de Evidencias', isset($proyecto['evidencias']) ? count($proyecto['evidencias']) : 0],
+        ];
+
+        $callback = function () use ($columns, $data) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            foreach ($data as $row) {
+                fputcsv($file, $row);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+    public function exportarWord($id)
+{
+    $proyecto = DB::connection('mongodb')->collection('proyectos')->find(new ObjectId($id));
+
+    if (!$proyecto) {
+        return redirect()->back()->with('error', 'Proyecto no encontrado.');
+    }
+
+    $nombreArchivo = 'proyecto_' . ($proyecto['nombre'] ?? 'desconocido') . '.doc';
+
+    $contenido = "
+        <html>
+        <head>
+            <meta charset='UTF-8'>
+            <style>
+                body { font-family: Arial, sans-serif; }
+                h1 { color: #2F4F4F; }
+                table { border-collapse: collapse; width: 100%; }
+                th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+            </style>
+        </head>
+        <body>
+            <h1>📋 Detalles del Proyecto</h1>
+            <table>
+                <tr><th>Campo</th><th>Valor</th></tr>
+                <tr><td>Nombre</td><td>{$proyecto['nombre']}</td></tr>
+                <tr><td>Descripción</td><td>{$proyecto['descripcion']}</td></tr>
+                <tr><td>Año</td><td>{$proyecto['anio']}</td></tr>
+                <tr><td>Costo</td><td>L. {$proyecto['costo']}</td></tr>
+                <tr><td>Estado</td><td>{$proyecto['estado']}</td></tr>
+                <tr><td>Progreso</td><td>{$proyecto['progreso']}%</td></tr>
+                <tr><td>Gasto Total</td><td>L. {$proyecto['gasto_total']}</td></tr>
+                <tr><td>Cantidad de Evidencias</td><td>" . (isset($proyecto['evidencias']) ? count($proyecto['evidencias']) : 0) . "</td></tr>
+            </table>
+            <p>Generado automáticamente el " . now()->format('d/m/Y H:i') . "</p>
+        </body>
+        </html>
+    ";
+
+    $headers = [
+        "Content-type" => "application/msword",
+        "Content-Disposition" => "attachment; filename={$nombreArchivo}",
+        "Pragma" => "no-cache",
+        "Expires" => "0"
+    ];
+
+    return response($contenido, 200, $headers);
 }
+
+}
+

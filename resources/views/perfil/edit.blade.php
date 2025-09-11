@@ -80,6 +80,12 @@
                     <label class="form-check-label">Activo</label>
                 </div>
 
+                <div class="form-group mt-3">
+                    <label><strong>Foto de perfil</strong></label>
+                    <input type="file" name="photo" class="form-control" accept="image/*" onchange="previewAvatar(this)">
+                    <small class="text-muted">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 2MB</small>
+                </div>
+
                 <div class="text-right mt-3">
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-save"></i> Actualizar datos
@@ -93,11 +99,30 @@
     <div class="col-md-4">
         <div class="perfil-card text-center">
             <h5 class="mb-3"><strong>Foto de perfil</strong></h5>
-            <img id="avatarPreview"
-                 src="{{ $user->photo ? asset('storage/' . $user->photo) : asset('img/avatar.png') }}"
-                 class="custom-avatar shadow-sm mb-3"
-                 alt="Foto de perfil">
-            <input type="file" name="photo" class="form-control" onchange="previewAvatar(this)">
+            <div class="avatar-container">
+                <img id="avatarPreview"
+                     src="{{ $user->avatar_url }}"
+                     class="custom-avatar shadow-sm mb-3"
+                     alt="Foto de perfil">
+                
+                @if($user->photo)
+                    <div class="avatar-overlay">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removePhoto()" title="Eliminar foto">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                @endif
+            </div>
+            
+            @if($user->photo)
+                <p class="text-muted small">Tienes una foto de perfil personalizada</p>
+            @else
+                <p class="text-muted small">Usando avatar por defecto</p>
+            @endif
+        
+            @if(session('error_photo'))
+                <div class="alert alert-danger mt-2">{{ session('error_photo') }}</div>
+            @endif
         </div>
     </div>
 </div>
@@ -127,6 +152,24 @@
         border-radius: 50%;
         border: 1px solid #ccc;
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    .avatar-container {
+        position: relative;
+        display: inline-block;
+    }
+    .avatar-overlay {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .avatar-container:hover .avatar-overlay {
+        opacity: 1;
+    }
+    .avatar-container:hover .custom-avatar {
+        filter: brightness(0.8);
     }
 </style>
 @stop
@@ -140,6 +183,34 @@
                 document.getElementById('avatarPreview').src = e.target.result;
             }
             reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function removePhoto() {
+        if (confirm('¿Estás seguro de que quieres eliminar tu foto de perfil?')) {
+            fetch('{{ route("perfil.remove.photo") }}', {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Cambiar la imagen al avatar por defecto
+                    document.getElementById('avatarPreview').src = '{{ asset("img/avatar.png") }}';
+                    
+                    // Recargar la página para actualizar la interfaz
+                    location.reload();
+                } else {
+                    alert('Error al eliminar la foto');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al eliminar la foto');
+            });
         }
     }
 </script>

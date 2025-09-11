@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
-//use App\Http\Controllers\BeneficiarioController;
+use App\Http\Controllers\BeneficiarioController;
 use App\Http\Controllers\AvanceController;
 use App\Http\Controllers\DocumentoController;
 use App\Http\Controllers\SolicitudController;
@@ -19,7 +19,7 @@ Route::resource('usuarios', UsuarioController::class)->names('usuarios');
 /***********************Gestor de proyectos******************************/
 use App\Http\Controllers\Gestor\ProyectoController as GestorProyectoController;
 
-Route::prefix('gestor/proyectos')->group(function () {
+Route::prefix('gestor/proyectos')->middleware(['auth', 'check.page.active'])->group(function () {
     Route::get('/', [GestorProyectoController::class, 'index'])->name('gestor.proyectos.index');
     Route::get('/crear', [GestorProyectoController::class, 'crear'])->name('gestor.proyectos.crear');
     Route::get('/seguimiento', [GestorProyectoController::class, 'seguimiento'])->name('gestor.proyectos.seguimiento');
@@ -31,7 +31,7 @@ Route::prefix('gestor/proyectos')->group(function () {
    
 });
 
- Route::prefix('gestor')->middleware('gestor')->group(function () {
+ Route::prefix('gestor')->middleware(['gestor', 'check.page.active'])->group(function () {
     Route::get('/comuni', [App\Http\Controllers\gestor\ComuniController::class, 'index'])->name('gestor.comuni');
 });
 
@@ -40,14 +40,14 @@ Route::post('/asignar', [App\Http\Controllers\ProyectoController::class, 'asigna
 use App\Http\Controllers\Gestor\ProyectoController;
 
 
-Route::prefix('gestor/proyectos')->name('gestor.proyectos.')->group(function() {
+Route::prefix('gestor/proyectos')->name('gestor.proyectos.')->middleware(['auth', 'check.page.active'])->group(function() {
     Route::get('/', [ProyectoController::class, 'index'])->name('index');
     Route::post('/store', [ProyectoController::class, 'store'])->name('store');
     Route::post('/asignar', [ProyectoController::class, 'asignar'])->name('asignar');
     Route::post('/evidencias/guardar', [ProyectoController::class, 'guardarEvidencia'])->name('evidencias.guardar');
 });
 
-Route::prefix('gestor/proyectos')->group(function () {
+Route::prefix('gestor/proyectos')->middleware(['auth', 'check.page.active'])->group(function () {
     Route::get('/', [ProyectoController::class, 'index'])->name('gestor.proyectos.index');
     Route::post('/store', [ProyectoController::class, 'store'])->name('gestor.proyectos.store');
     Route::post('/asignar', [ProyectoController::class, 'asignar'])->name('gestor.proyectos.asignar');
@@ -57,101 +57,105 @@ Route::prefix('gestor/proyectos')->group(function () {
     Route::put('/actualizar/{id}', [ProyectoController::class, 'actualizar'])->name('gestor.proyectos.actualizar');
     Route::delete('/eliminar/{id}', [ProyectoController::class, 'eliminar'])->name('gestor.proyectos.eliminar');
 });
-Route::get('gestor/proyectos/editar/{id}', [ProyectoController::class, 'editar'])->name('gestor.proyectos.editar');
-Route::put('gestor/proyectos/actualizar/{id}', [ProyectoController::class, 'actualizar'])->name('gestor.proyectos.actualizar');
-Route::delete('gestor/proyectos/eliminar/{id}', [ProyectoController::class, 'eliminar'])->name('gestor.proyectos.eliminar');
-Route::post('gestor/proyectos/asignar', [ProyectoController::class, 'asignar'])->name('gestor.proyectos.asignar');
-Route::put('gestor/proyectos/{id}/actualizar', [ProyectoController::class, 'actualizar'])->name('gestor.proyectos.actualizar');
+Route::get('gestor/proyectos/editar/{id}', [ProyectoController::class, 'editar'])->name('gestor.proyectos.editar')->middleware(['auth', 'check.page.active']);
+Route::put('gestor/proyectos/actualizar/{id}', [ProyectoController::class, 'actualizar'])->name('gestor.proyectos.actualizar')->middleware(['auth', 'check.page.active']);
+Route::delete('gestor/proyectos/eliminar/{id}', [ProyectoController::class, 'eliminar'])->name('gestor.proyectos.eliminar')->middleware(['auth', 'check.page.active']);
+Route::post('gestor/proyectos/asignar', [ProyectoController::class, 'asignar'])->name('gestor.proyectos.asignar')->middleware(['auth', 'check.page.active']);
+Route::put('gestor/proyectos/{id}/actualizar', [ProyectoController::class, 'actualizar'])->name('gestor.proyectos.actualizar')->middleware(['auth', 'check.page.active']);
 use App\Http\Controllers\Gestor\CronogramaController;
 
-Route::prefix('gestor/proyectos')->middleware(['auth'])->group(function () {
+Route::prefix('gestor/proyectos')->middleware(['auth', 'check.page.active'])->group(function () {
     Route::get('cronograma/{proyecto_id}', [CronogramaController::class, 'index'])->name('gestor.proyectos.cronograma');
     Route::post('cronograma/store', [CronogramaController::class, 'store'])->name('gestor.proyectos.cronograma.store');
     Route::post('cronograma/finalizar/{actividad_id}', [CronogramaController::class, 'finalizar'])->name('gestor.proyectos.cronograma.finalizar');
 });
-Route::get('gestor/asignados', [ProyectoController::class, 'asignados'])->name('gestor.asignados');
-Route::get('gestor/asignados/cronograma/{id}', [ProyectoController::class, 'cronograma'])->name('gestor.cronograma');
-Route::get('gestor/asignados/avances/{id}', [ProyectoController::class, 'avances'])->name('gestor.avances');
-Route::get('gestor/asignados', [ProyectoController::class, 'asignados'])->name('gestor.proyectos.asignados');
-Route::get('gestor/asignados/{id}/cronograma', [ProyectoController::class, 'cronograma'])->name('gestor.proyectos.cronograma');
-Route::get('gestor/asignados/{id}/avances', [ProyectoController::class, 'avances'])->name('gestor.proyectos.avances');
-Route::get('gestor/asignados/cronograma/{id}', [ProyectoController::class, 'cronograma'])->name('gestor.proyectos.cronograma');
-Route::post('gestor/proyectos/cronograma/finalizar/{id}', [ProyectoController::class, 'finalizarActividad'])->name('gestor.proyectos.cronograma.finalizar');
+Route::get('gestor/asignados', [ProyectoController::class, 'asignados'])->name('gestor.asignados')->middleware(['auth', 'check.page.active']);
+Route::get('gestor/asignados/cronograma/{id}', [ProyectoController::class, 'cronograma'])->name('gestor.cronograma')->middleware(['auth', 'check.page.active']);
+Route::get('gestor/asignados/avances/{id}', [ProyectoController::class, 'avances'])->name('gestor.avances')->middleware(['auth', 'check.page.active']);
+Route::get('gestor/asignados', [ProyectoController::class, 'asignados'])->name('gestor.proyectos.asignados')->middleware(['auth', 'check.page.active']);
+Route::get('gestor/asignados/{id}/cronograma', [ProyectoController::class, 'cronograma'])->name('gestor.proyectos.cronograma')->middleware(['auth', 'check.page.active']);
+Route::get('gestor/asignados/{id}/avances', [ProyectoController::class, 'avances'])->name('gestor.proyectos.avances')->middleware(['auth', 'check.page.active']);
+Route::get('gestor/asignados/cronograma/{id}', [ProyectoController::class, 'cronograma'])->name('gestor.proyectos.cronograma')->middleware(['auth', 'check.page.active']);
+Route::post('gestor/proyectos/cronograma/finalizar/{id}', [ProyectoController::class, 'finalizarActividad'])->name('gestor.proyectos.cronograma.finalizar')->middleware(['auth', 'check.page.active']);
 Route::post('/gestor/proyectos/avances/guardar', [ProyectoController::class, 'guardarAvance'])
-     ->name('gestor.proyectos.avances.guardar');
+     ->name('gestor.proyectos.avances.guardar')->middleware(['auth', 'check.page.active']);
 
-Route::post('gestor/proyectos/avances/store', [ProyectoController::class, 'guardarAvance'])->name('gestor.proyectos.avances.store');
+Route::post('gestor/proyectos/avances/store', [ProyectoController::class, 'guardarAvance'])->name('gestor.proyectos.avances.store')->middleware(['auth', 'check.page.active']);
 
-Route::post('gestor/proyectos/avances/guardar', [ProyectoController::class, 'guardarAvance'])->name('gestor.proyectos.avances.store');
+Route::post('gestor/proyectos/avances/guardar', [ProyectoController::class, 'guardarAvance'])->name('gestor.proyectos.avances.store')->middleware(['auth', 'check.page.active']);
 Route::post('/gestor/proyectos/avances/guardar', [ProyectoController::class, 'guardarAvance'])
-    ->name('gestor.proyectos.avances.store');
-Route::get('gestor/proyectos/avances/{id}', [ProyectoController::class, 'avances'])->name('gestor.proyectos.avances');
+    ->name('gestor.proyectos.avances.store')->middleware(['auth', 'check.page.active']);
+Route::get('gestor/proyectos/avances/{id}', [ProyectoController::class, 'avances'])->name('gestor.proyectos.avances')->middleware(['auth', 'check.page.active']);
 Route::post('/gestor/proyectos/avances/guardar', [App\Http\Controllers\Gestor\ProyectoController::class, 'guardarAvance'])
-    ->name('gestor.proyectos.avances.guardar');
+    ->name('gestor.proyectos.avances.guardar')->middleware(['auth', 'check.page.active']);
 Route::get('gestor/asignados/cronograma/{id}', [App\Http\Controllers\Gestor\ProyectoController::class, 'cronograma'])
-    ->name('gestor.cronograma');
+    ->name('gestor.cronograma')->middleware(['auth', 'check.page.active']);
 Route::post('/gestor/proyectos/progreso/{id}', [App\Http\Controllers\Gestor\ProyectoController::class, 'actualizarProgreso'])
-    ->name('gestor.proyectos.actualizarProgreso');
+    ->name('gestor.proyectos.actualizarProgreso')->middleware(['auth', 'check.page.active']);
 
-Route::get('/gestor/proyectos/avances/exportar-word/{id}', [ProyectoController::class, 'exportarWord'])->name('gestor.proyectos.exportarWord');
-Route::get('/gestor/proyectos/avances/exportar-excel/{id}', [ProyectoController::class, 'exportarExcel'])->name('gestor.proyectos.exportarExcel');
+Route::get('/gestor/proyectos/avances/exportar-word/{id}', [ProyectoController::class, 'exportarWord'])->name('gestor.proyectos.exportarWord')->middleware(['auth', 'check.page.active']);
+Route::get('/gestor/proyectos/avances/exportar-excel/{id}', [ProyectoController::class, 'exportarExcel'])->name('gestor.proyectos.exportarExcel')->middleware(['auth', 'check.page.active']);
 
 
-Route::get('/beneficiarios', [\App\Http\Controllers\Gestor\BenelisController::class, 'index'])->name('beneficiarios.index');
-Route::get('/beneficiarios', [BenelisController::class, 'index'])->name('beneficiarios.index');
-Route::get('/beneficiarios', [BenelisController::class, 'index'])->name('beneficiarios.index');
+Route::get('/beneficiarios', [\App\Http\Controllers\Gestor\BenelisController::class, 'index'])->name('beneficiarios.index')->middleware(['auth', 'check.page.active']);
+Route::get('/beneficiarios', [BenelisController::class, 'index'])->name('beneficiarios.index')->middleware(['auth', 'check.page.active']);
+Route::get('/beneficiarios', [BenelisController::class, 'index'])->name('beneficiarios.index')->middleware(['auth', 'check.page.active']);
+
 use App\Http\Controllers\Gestor\BenelisController;
 
-Route::get('/beneficiarios', [BenelisController::class, 'index'])->name('beneficiarios.index');
+Route::get('/beneficiarios', [BenelisController::class, 'index'])->name('beneficiarios.index')->middleware(['auth', 'check.page.active']);
 Route::get('/beneficiarios/proyectos-asignados', [App\Http\Controllers\Gestor\BenelisController::class, 'proyectosAsignados'])
-    ->name('beneficiarios.proyectos.asignados');
-Route::get('/beneficiarios/seleccionar-proyecto', [BenelisController::class, 'seleccionarProyecto'])->name('beneficiarios.seleccionar');
-Route::get('/beneficiarios/registrar/{proyecto_id}', [BenelisController::class, 'formulario'])->name('beneficiarios.registrar');
-Route::get('beneficiarios/seleccionar', [BenelisController::class, 'seleccionarProyecto'])->name('beneficiarios.seleccionar');
-Route::get('beneficiarios/formulario/{proyecto_id}', [BenelisController::class, 'formulario'])->name('beneficiarios.formulario');
+    ->name('beneficiarios.proyectos.asignados')->middleware(['auth', 'check.page.active']);
+Route::get('/beneficiarios/seleccionar-proyecto', [BenelisController::class, 'seleccionarProyecto'])->name('beneficiarios.seleccionar')->middleware(['auth', 'check.page.active']);
+Route::get('/beneficiarios/registrar/{proyecto_id}', [BenelisController::class, 'formulario'])->name('beneficiarios.registrar')->middleware(['auth', 'check.page.active']);
+Route::get('beneficiarios/seleccionar', [BenelisController::class, 'seleccionarProyecto'])->name('beneficiarios.seleccionar')->middleware(['auth', 'check.page.active']);
+Route::get('beneficiarios/formulario/{proyecto_id}', [BenelisController::class, 'formulario'])->name('beneficiarios.formulario')->middleware(['auth', 'check.page.active']);
 
 // Mostrar proyectos asignados para registrar beneficiario
-Route::get('beneficiarios/seleccionar-proyecto', [BenelisController::class, 'seleccionarProyecto'])->name('beneficiarios.seleccionar');
+Route::get('beneficiarios/seleccionar-proyecto', [BenelisController::class, 'seleccionarProyecto'])->name('beneficiarios.seleccionar')->middleware(['auth', 'check.page.active']);
 
 // Mostrar formulario de registro con el proyecto ya seleccionado
-Route::get('beneficiarios/formulario/{proyecto_id}', [BenelisController::class, 'formulario'])->name('beneficiarios.formulario');
+Route::get('beneficiarios/formulario/{proyecto_id}', [BenelisController::class, 'formulario'])->name('beneficiarios.formulario')->middleware(['auth', 'check.page.active']);
 
 // Guardar beneficiario (esto ya lo debes tener, solo por si acaso)
-Route::post('beneficiarios/store', [BenelisController::class, 'store'])->name('beneficiarios.store');
-Route::get('beneficiarios/proyectos-asignados', [BenelisController::class, 'proyectosAsignados'])->name('beneficiarios.proyectos.asignados');
+Route::post('beneficiarios/store', [BenelisController::class, 'store'])->name('beneficiarios.store')->middleware(['auth', 'check.page.active']);
+Route::get('beneficiarios/proyectos-asignados', [BenelisController::class, 'proyectosAsignados'])->name('beneficiarios.proyectos.asignados')->middleware(['auth', 'check.page.active']);
 
 /***********************************************************************/
-Route::get('/beneficiarios', [App\Http\Controllers\Gestor\BenelisController::class, 'mostrarProyectosAsignados'])->name('beneficiarios.index');
-Route::post('/beneficiarios/guardar', [BeneficiarioController::class, 'store'])->name('beneficiarios.guardar');
-Route::get('/beneficiarios', [BeneficiarioController::class, 'index'])->name('beneficiarios.index');
-Route::get('/beneficiarios/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
-Route::post('/beneficiarios/guardar', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.guardar');
+Route::get('/beneficiarios', [App\Http\Controllers\Gestor\BenelisController::class, 'mostrarProyectosAsignados'])->name('beneficiarios.index')->middleware(['auth', 'check.page.active']);
+Route::post('/beneficiarios/guardar', [BeneficiarioController::class, 'store'])->name('beneficiarios.guardar')->middleware(['auth', 'check.page.active']);
+Route::get('/beneficiarios', [BeneficiarioController::class, 'index'])->name('beneficiarios.index')->middleware(['auth', 'check.page.active']);
+Route::get('/beneficiarios/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario')->middleware(['auth', 'check.page.active']);
+Route::post('/beneficiarios/guardar', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.guardar')->middleware(['auth', 'check.page.active']);
 // AJAX para cargar municipios y colonias
 Route::get('/beneficiarios/municipios/{id}', [BeneficiarioController::class, 'obtenerMunicipios']);
 Route::get('/beneficiarios/colonias/{id}', [BeneficiarioController::class, 'obtenerColonias']);
-Route::get('/beneficiarios/registrar/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.registrar');
-Route::get('gestor/beneficiarios/formulario/{proyecto_id}', [BenelisController::class, 'formulario'])->name('gestor.beneficiarios.formulario');
+Route::get('/beneficiarios/registrar/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.registrar')->middleware(['auth', 'check.page.active']);
+Route::get('gestor/beneficiarios/formulario/{proyecto_id}', [BenelisController::class, 'formulario'])->name('gestor.beneficiarios.formulario')->middleware(['auth', 'check.page.active']);
 Route::get('/beneficiarios/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
 Route::post('/beneficiarios/guardar', [BeneficiarioController::class, 'store'])->name('beneficiarios.store');
 Route::get('/beneficiarios/municipios/{id}', [BeneficiarioController::class, 'obtenerMunicipios']);
 Route::get('/beneficiarios/colonias/{id}', [BeneficiarioController::class, 'obtenerColonias']);
-Route::prefix('gestor/beneficiarios')->middleware('auth')->group(function () {
+Route::prefix('gestor/beneficiarios')->middleware(['auth', 'check.page.active'])->group(function () {
     Route::get('seleccionar', [BenelisController::class, 'seleccionarProyecto'])->name('gestor.beneficiarios.seleccionarProyecto');
     Route::get('formulario/{id}', [BenelisController::class, 'formulario'])->name('gestor.beneficiarios.formulario');
 });
-Route::get('gestor/beneficiarios/formulario/{proyecto_id}', [BenelisController::class, 'formulario'])->name('gestor.beneficiarios.formulario');
+Route::get('gestor/beneficiarios/formulario/{proyecto_id}', [BenelisController::class, 'formulario'])->name('gestor.beneficiarios.formulario')->middleware(['auth', 'check.page.active']);
 
-Route::prefix('beneficiarios')->middleware(['auth'])->group(function () {
+Route::prefix('beneficiarios')->middleware(['auth', 'check.page.active'])->group(function () {
     Route::get('/', [BeneficiarioController::class, 'index'])->name('beneficiarios.index');
     Route::get('/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
     Route::post('/guardar', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.guardar');
 });
 
-Route::get('/beneficiarios', [BenelisController::class, 'index'])->name('beneficiarios.index');
-Route::get('/beneficiarios/proyectos-asignados', [BenelisController::class, 'proyectosAsignados'])->name('beneficiarios.proyectos.asignados');
+Route::get('/beneficiarios', [BenelisController::class, 'index'])->name('beneficiarios.index')->middleware(['auth', 'check.page.active']);
+Route::get('/beneficiarios/proyectos-asignados', [BenelisController::class, 'proyectosAsignados'])->name('beneficiarios.proyectos.asignados')->middleware(['auth', 'check.page.active']);
+
+
+
 /**********************************Salon******************************** */
 // Rutas de gestión del salón
-Route::prefix('gestor/salon')->middleware(['auth'])->group(function () {
+Route::prefix('gestor/salon')->middleware(['auth', 'check.page.active'])->group(function () {
     Route::get('/', [App\Http\Controllers\SalonController::class, 'index'])->name('gestor.salon.index');
     Route::post('/guardar', [App\Http\Controllers\SalonController::class, 'guardar'])->name('gestor.salon.guardar');
 });
@@ -162,8 +166,8 @@ Route::prefix('gestor/salon')->middleware(['auth'])->group(function () {
 /*********************************************************************** */
 /**********************************solicitudes******************************** */
 // Rutas de gestión del salón
-Route::get('crear/solicitud', [SolicitudController::class, 'create'])->name('solicitudes.create');
-Route::post('crear/solicitud', [SolicitudController::class, 'store'])->name('solicitudes.store');
+Route::get('crear/solicitud', [SolicitudController::class, 'create'])->name('solicitudes.create')->middleware(['auth', 'check.page.active']);
+Route::post('crear/solicitud', [SolicitudController::class, 'store'])->name('solicitudes.store')->middleware(['auth', 'check.page.active']);
 Route::get('mostrar/solicitudes', [SolicitudController::class, 'mostrar'])->name('solicitudes.mostrar');
 Route::post('solicitudes/aceptar/{id}', [SolicitudController::class, 'aceptar'])->name('solicitudes.aceptar');
 Route::post('solicitudes/rechazar/{id}', [SolicitudController::class, 'rechazar'])->name('solicitudes.rechazar');
@@ -184,24 +188,32 @@ Route::get('solicitudes/exportar', [SolicitudController::class, 'exportar'])->na
 /*********************************************************************** */
 /**********************************tareas***********************************************/
 
-use App\Http\Controllers\Gestor\TareaController;
-Route::prefix('gestor/tareas')->group(function () {
-    // Vista principal de tareas/actividades
-    Route::get('/', [TareaController::class, 'index'])->name('gestor.tareas.index');
+// ADMIN: tareas
+use App\Http\Controllers\Admin\TareaController as AdminTareaController;
 
-    // Guardar nueva tarea
-    Route::post('/guardar', [TareaController::class, 'guardar'])->name('gestor.tareas.guardar');
-
-    // Cambiar estado de una tarea (ej: Pendiente -> Completada)
-    Route::post('/{id}/completar', [TareaController::class, 'completar'])->name('gestor.tareas.completar');
+Route::middleware(['auth'])->prefix('admin/tareas')->group(function () {
+    Route::get('/', [AdminTareaController::class, 'index'])->name('admin.tareas.index');
+    Route::post('/guardar', [AdminTareaController::class, 'guardar'])->name('admin.tareas.guardar');
+    Route::post('/{id}/completar', [AdminTareaController::class, 'completar'])->name('admin.tareas.completar');
+    Route::delete('/{id}/eliminar', [AdminTareaController::class, 'eliminar'])->name('admin.tareas.eliminar'); // ✅ NUEVA RUTA
 });
+
+
+use App\Http\Controllers\Gestor\TareaController as GestorTareaController;
+
+Route::prefix('gestor/tareas')->middleware(['auth', 'check.page.active'])->group(function () {
+    Route::get('/', [GestorTareaController::class, 'misTareas'])->name('gestor.tareas.mis-tareas');
+    Route::post('/{id}/finalizar', [GestorTareaController::class, 'finalizarTarea'])->name('gestor.tareas.finalizar');
+});
+
+
 
 /***************************************************************************************/
 
 /**********************************citas********************************************** */
 use App\Http\Controllers\CitasController;
 
-Route::prefix('gestor/citas')->middleware(['auth'])->group(function () {
+Route::prefix('gestor/citas')->middleware(['auth', 'check.page.active'])->group(function () {
     Route::get('/', [CitasController::class, 'index'])->name('gestor.citas.index');
     Route::post('/guardar', [CitasController::class, 'guardar'])->name('gestor.citas.guardar');
 });
@@ -210,17 +222,17 @@ Route::prefix('gestor/citas')->middleware(['auth'])->group(function () {
 
 /*********************************beneficiarios******************************************** */
 
-Route::prefix('gestor/beneficiarios')->group(function () {
+Route::prefix('gestor/beneficiarios')->middleware(['auth', 'check.page.active'])->group(function () {
     Route::get('/', [App\Http\Controllers\Gestor\BenelisController::class, 'index'])->name('beneficiarios.index');
     Route::get('/encuesta/{id}', [App\Http\Controllers\Gestor\BenelisController::class, 'encuesta'])->name('beneficiarios.encuesta');
 });
-Route::prefix('gestor/beneficiarios')->group(function () {
+Route::prefix('gestor/beneficiarios')->middleware(['auth', 'check.page.active'])->group(function () {
     Route::get('/', [App\Http\Controllers\Gestor\BenelisController::class, 'index'])->name('beneficiarios.index');
     Route::get('/encuesta/{id}', [App\Http\Controllers\Gestor\BenelisController::class, 'encuesta'])->name('beneficiarios.encuesta');
     Route::post('/encuesta/{id}/guardar', [App\Http\Controllers\Gestor\BenelisController::class, 'guardarEncuesta'])->name('beneficiarios.guardarEncuesta');
 });
-Route::get('/gestor/documentos', [App\Http\Controllers\Gestor\DocumentosController::class, 'index'])->name('documentos.index');
-Route::get('/gestor/documentos/exportar/{tipo}', [App\Http\Controllers\Gestor\DocumentosController::class, 'exportar'])->name('documentos.exportar');
+Route::get('/gestor/documentos', [App\Http\Controllers\Gestor\DocumentosController::class, 'index'])->name('documentos.index')->middleware(['auth', 'check.page.active']);
+Route::get('/gestor/documentos/exportar/{tipo}', [App\Http\Controllers\Gestor\DocumentosController::class, 'exportar'])->name('documentos.exportar')->middleware(['auth', 'check.page.active']);
     Route::get('/gestor/documentos/exportar/{tipo}', [App\Http\Controllers\Gestor\DocumentosController::class, 'exportar'])->name('documentos.exportar');
 
 
@@ -228,13 +240,13 @@ Route::get('/gestor/documentos/exportar/{tipo}', [App\Http\Controllers\Gestor\Do
     Route::get('resumen-general', [ResumenController::class, 'index'])->name('resumen.index');
 use App\Http\Controllers\Gestor\ResumenController;
 
-Route::get('gestor/dashboard', [ResumenController::class, 'index'])->name('resumen.index');
+Route::get('gestor/dashboard', [ResumenController::class, 'index'])->name('resumen.index')->middleware(['auth', 'check.page.active']);
 
 
-Route::prefix('gestor')->group(function () {
+Route::prefix('gestor')->middleware(['auth', 'check.page.active'])->group(function () {
     Route::get('/citas', [CitasController::class, 'index'])->name('gestor.citas.index');
 });
-Route::get('/gestor/citas', [CitasController::class, 'index'])->name('gestor.citas.index');
+Route::get('/gestor/citas', [CitasController::class, 'index'])->name('gestor.citas.index')->middleware(['auth', 'check.page.active']);
 
 
 
@@ -294,20 +306,21 @@ Route::middleware(['auth', 'adminOTecnicoOnly'])->group(function () {
 // ====================================
 // CALENDARIO (GENÉRICO PARA AUTENTICADOS)
 // ====================================
-Route::middleware('auth')->get('/calendario', function () {
+Route::middleware(['auth', 'check.page.active'])->get('/calendario', function () {
     return view('pages.calendar');
 });
 
 Route::get('/mapa', [TuControlador::class, 'mostrarMapa'])->name('mapa');
 
 //mensajeria 
-Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
-Route::post('/chat/mensaje', [ChatController::class, 'store'])->name('chat.store');
-Route::delete('/chat/mensaje/{id}', [ChatController::class, 'destroy'])->name('chat.destroy');
+Route::get('/chat', [ChatController::class, 'index'])->name('chat.index')->middleware(['auth', 'check.page.active']);
+Route::post('/chat/mensaje', [ChatController::class, 'store'])->name('chat.store')->middleware(['auth', 'check.page.active']);
+Route::delete('/chat/mensaje/{id}', [ChatController::class, 'destroy'])->name('chat.destroy')->middleware(['auth', 'check.page.active']);
 
 // perfil
-Route::get('perfil/edit', [PerfilController::class, 'edit'])->name('perfil.edit');
-Route::post('perfil/update', [PerfilController::class, 'update'])->name('perfil.update');
+Route::get('perfil/edit', [PerfilController::class, 'edit'])->name('perfil.edit')->middleware(['auth', 'check.page.active']);
+Route::post('perfil/update', [PerfilController::class, 'update'])->name('perfil.update')->middleware(['auth', 'check.page.active']);
+Route::delete('perfil/remove-photo', [PerfilController::class, 'removePhoto'])->name('perfil.remove.photo')->middleware(['auth', 'check.page.active']);
 
 // ====================================
 // RUTAS SOLO PARA ADMINISTRADOR
@@ -341,13 +354,21 @@ Route::middleware(['auth', 'adminonly'])->prefix('admin')->group(function () {
 });
 
 Route::get('notificaciones', [App\Http\Controllers\NotificacionController::class, 'index'])
-    ->name('notificaciones')
-    ->middleware('auth');
+    ->name('notificaciones.index')
+    ->middleware(['auth', 'check.page.active']);
 
-Route::get('gestor/asignados', [App\Http\Controllers\Gestor\ProyectoController::class, 'asignados'])->name('gestor.asignados')->middleware('auth');
-Route::post('gestor/asignados/{proyecto}/evidencia', [App\Http\Controllers\Gestor\ProyectoController::class, 'subirEvidencia'])->name('gestor.evidencia.subir')->middleware('auth');
-Route::get('gestor/asignados/{proyecto}/evidencia/{archivo}', [App\Http\Controllers\Gestor\ProyectoController::class, 'descargarEvidencia'])->name('gestor.evidencia.descargar')->middleware('auth');
-Route::delete('gestor/asignados/{proyecto}/evidencia/{archivo}', [App\Http\Controllers\Gestor\ProyectoController::class, 'eliminarEvidencia'])->name('gestor.evidencia.eliminar')->middleware('auth');
+Route::delete('notificaciones/{id}/eliminar', [App\Http\Controllers\NotificacionController::class, 'eliminar'])
+    ->name('notificaciones.eliminar')
+    ->middleware(['auth', 'check.page.active']);
+
+Route::delete('notificaciones/eliminar-todas', [App\Http\Controllers\NotificacionController::class, 'eliminarTodas'])
+    ->name('notificaciones.eliminar-todas')
+    ->middleware(['auth', 'check.page.active']);
+
+//Route::get('gestor/asignados', [App\Http\Controllers\Gestor\ProyectoController::class, 'asignados'])->name('gestor.asignados')->middleware('auth');
+//Route::post('gestor/asignados/{proyecto}/evidencia', [App\Http\Controllers\Gestor\ProyectoController::class, 'subirEvidencia'])->name('gestor.evidencia.subir')->middleware('auth');
+//Route::get('gestor/asignados/{proyecto}/evidencia/{archivo}', [App\Http\Controllers\Gestor\ProyectoController::class, 'descargarEvidencia'])->name('gestor.evidencia.descargar')->middleware('auth');
+//Route::delete('gestor/asignados/{proyecto}/evidencia/{archivo}', [App\Http\Controllers\Gestor\ProyectoController::class, 'eliminarEvidencia'])->name('gestor.evidencia.eliminar')->middleware('auth');
 
 
 use Illuminate\Support\Facades\Password;
@@ -367,48 +388,86 @@ Route::get('/test-email', function () {
     return '✅ Correo de recuperación enviado correctamente.';
 });
 
-use App\Http\Controllers\Gestor\BeneficiarioController;
+Route::get('admin/configuracion', function () {
+    return view('admin.configuracion');
+})->middleware(['auth']);
 
-Route::prefix('beneficiarios')->middleware(['auth'])->group(function () {
-    Route::get('/', [BeneficiarioController::class, 'index'])->name('beneficiarios.index');
-    Route::get('/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
-    Route::post('/guardar', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.guardar');
+Route::get('gestor/configuracion', function () {
+    return view('gestor.configuracion');
+})->middleware(['auth', 'check.page.active']);
 
-    // Para selects dependientes si los usas
-    Route::get('/municipios/{departamento_id}', [BeneficiarioController::class, 'obtenerMunicipios'])->name('beneficiarios.municipios');
-    Route::get('/colonias/{municipio_id}', [BeneficiarioController::class, 'obtenerColonias'])->name('beneficiarios.colonias');
+use App\Http\Controllers\Gestor\AdminConfiguracionController;
+
+Route::get('admin/configuracion/activar-desactivar', [AdminConfiguracionController::class, 'activarDesactivar'])->middleware(['auth']);
+Route::post('admin/configuracion/activar-desactivar', [AdminConfiguracionController::class, 'toggle'])->middleware(['auth']);
+
+use App\Http\Controllers\Gestor\ConfiguracionController;
+
+
+
+//use App\Http\Controllers\Gestor\BeneficiarioController;
+
+// Grupo principal con middleware auth
+Route::middleware(['auth'])->group(function () {
+    
+    // Grupo prefijado con 'beneficiarios'
+    Route::prefix('beneficiarios')->group(function () {
+        Route::get('/', [BeneficiarioController::class, 'index'])->name('beneficiarios.index');
+        Route::get('/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
+        Route::post('/guardar', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.store');
+
+        // Rutas para selects dependientes (internas del sistema)
+        Route::get('/municipios/{departamento_id}', [BeneficiarioController::class, 'obtenerMunicipios'])->name('beneficiarios.municipios');
+        Route::get('/colonias/{municipio_id}', [BeneficiarioController::class, 'obtenerColonias'])->name('beneficiarios.colonias');
+    });
+
+    // Rutas API externas
+    Route::get('/api/municipios/{departamentoId}', [BeneficiarioController::class, 'obtenerMunicipios']);
+    Route::get('/api/colonias/{municipioId}', [BeneficiarioController::class, 'obtenerColonias']);
 });
 
-Route::prefix('beneficiarios')->middleware(['auth'])->group(function () {
-    Route::get('/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
+
+Route::get('/beneficiarios/registrar/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario')->middleware(['auth', 'check.page.active']);
+Route::post('/beneficiarios', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.store')->middleware(['auth', 'check.page.active']);
+Route::get('/beneficiarios', [BeneficiarioController::class, 'index'])->name('beneficiarios.index')->middleware(['auth', 'check.page.active']);
+Route::get('/beneficiarios/formulario/{id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario')->middleware(['auth', 'check.page.active']);
+Route::post('/beneficiarios', [BeneficiarioController::class, 'store'])->name('beneficiarios.store')->middleware(['auth', 'check.page.active']);
+
+
+Route::get('/beneficiarios/municipios/{departamento_id}', [BeneficiarioController::class, 'obtenerMunicipios'])->name('beneficiarios.municipios');
+Route::get('/beneficiarios/colonias/{municipio_id}', [BeneficiarioController::class, 'obtenerColonias'])->name('beneficiarios.colonias');
+
+// RUTAS PARA GESTIÓN DE BENEFICIARIOS DEL GESTOR
+Route::prefix('gestor/beneficiarios')->middleware(['auth', 'check.page.active'])->group(function () {
+    // Lista de beneficiarios por proyecto
+    Route::get('/lista', [BenelisController::class, 'lista'])->name('beneficiarios.lista');
+
+    // Selección de proyecto para registrar
+    Route::get('/proyectos', [BenelisController::class, 'seleccionarProyecto'])->name('beneficiarios.proyectos');
+
+    // Formulario para registrar beneficiario en proyecto
+    Route::get('/formulario/{proyecto_id}', [BenelisController::class, 'formulario'])->name('beneficiarios.formulario');
+
+    // Guardar beneficiario
+    Route::post('/guardar', [BenelisController::class, 'guardar'])->name('beneficiarios.guardar');
+
+    // Encuesta a beneficiario
+    Route::get('/encuesta/{id}', [BenelisController::class, 'encuesta'])->name('beneficiarios.encuesta');
+    Route::post('/encuesta/{id}/guardar', [BenelisController::class, 'guardarEncuesta'])->name('beneficiarios.guardarEncuesta');
+
+    // AJAX: Municipios y colonias
+    Route::get('/municipios/{departamento_id}', [BenelisController::class, 'obtenerMunicipios'])->name('beneficiarios.municipios');
+    Route::get('/colonias/{municipio_id}', [BenelisController::class, 'obtenerColonias'])->name('beneficiarios.colonias');
+
+    Route::get('/encuesta/{id}', [BenelisController::class, 'encuesta'])->name('beneficiarios.encuesta');
+Route::post('/encuesta/{id}/guardar', [BenelisController::class, 'guardarEncuesta'])->name('beneficiarios.guardarEncuesta');
+Route::get('/encuesta/{id}', [BenelisController::class, 'encuesta'])->name('beneficiarios.encuesta');
+Route::post('/encuesta/{id}/guardar', [BenelisController::class, 'guardarEncuesta'])->name('beneficiarios.guardarEncuesta');
+Route::get('documentacion', [App\Http\Controllers\Gestor\BenelisController::class, 'evidenciaYDocumentacion'])->name('documentacion.index');
+Route::get('/documentacion', [App\Http\Controllers\Gestor\BenelisController::class, 'evidenciaYDocumentacion'])->name('documentacion.index');
+Route::get('/gestor/asignados', [ProyectoController::class, 'asignados'])->name('gestor.asignados');
+Route::get('/gestor/proyectos/exportar-excel/{id}', [\App\Http\Controllers\Gestor\ProyectoController::class, 'exportarExcel'])->name('gestor.proyectos.exportarExcel');
+Route::get('/gestor/proyectos/exportar-word/{id}', [\App\Http\Controllers\Gestor\ProyectoController::class, 'exportarWord'])->name('gestor.proyectos.exportarWord');
+
 });
 
-Route::prefix('beneficiarios')->middleware('auth')->group(function () {
-    Route::get('/', [BeneficiarioController::class, 'index'])->name('beneficiarios.index');
-    Route::get('/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
-    Route::post('/guardar', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.guardar');
-});
-Route::get('/beneficiarios/municipios/{departamento}', [BeneficiarioController::class, 'obtenerMunicipios'])->name('beneficiarios.municipios');
-Route::get('/beneficiarios/colonias/{municipio}', [BeneficiarioController::class, 'obtenerColonias'])->name('beneficiarios.colonias');
-Route::get('/beneficiarios/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
-Route::get('/beneficiarios/formulario/{id}', [BeneficiarioController::class, 'formulario']);
-Route::post('/beneficiarios', [BeneficiarioController::class, 'store'])->name('beneficiarios.store');
-// Beneficiarios
-Route::get('/beneficiarios', [BeneficiarioController::class, 'index'])->name('beneficiarios.index');
-Route::get('/beneficiarios/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario']);
-Route::post('/beneficiarios', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.store');
-
-// API para selects dependientes
-Route::get('/api/municipios/{departamento_id}', [BeneficiarioController::class, 'obtenerMunicipios']);
-Route::get('/api/colonias/{municipio_id}', [BeneficiarioController::class, 'obtenerColonias']);
-
-Route::get('/beneficiarios/formulario/{proyecto_id}', [BeneficiarioController::class, 'formulario']);
-
-Route::prefix('beneficiarios')->group(function () {
-    Route::get('/', [BeneficiarioController::class, 'index'])->name('beneficiarios.index');
-    Route::get('/formulario/{id}', [BeneficiarioController::class, 'formulario'])->name('beneficiarios.formulario');
-    Route::post('/guardar', [BeneficiarioController::class, 'guardar'])->name('beneficiarios.store');
-});
-
-Route::get('/api/municipios/{departamentoId}', [BeneficiarioController::class, 'obtenerMunicipios']);
-Route::get('/api/colonias/{municipioId}', [BeneficiarioController::class, 'obtenerColonias']);

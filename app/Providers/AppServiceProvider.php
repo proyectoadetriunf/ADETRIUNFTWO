@@ -109,18 +109,18 @@ class AppServiceProvider extends ServiceProvider
                         [
                             'text' => 'Asignar Actividades / Tareas',
                             'icon' => 'fas fa-tasks',
-                            'url'  => 'gestor/tareas',
+                            'url'  => 'admin/tareas',
                         ],
                         [
                             'text' => 'lista de Beneficiarios',
                             'icon' => 'fas fa-users',
                             'url'  => 'gestor/beneficiarios',
                         ],
-                        [
+                       /* [
                             'text' => 'Evidencias y Documentos',
                             'icon' => 'fas fa-folder-open',
                             'url'  => 'gestor/documentos',
-                        ],
+                        ],*/
                         [
                             'text' => 'Resumen General',
                             'icon' => 'fas fa-chart-bar',
@@ -193,7 +193,7 @@ class AppServiceProvider extends ServiceProvider
                 $event->menu->add([
                     'text' => 'Actividades/Tareas Asignadas',
                     'icon' => 'fas fa-tasks',
-                    'url'  => 'tares asignadas',
+                    'url'  => 'gestor/tareas',
                 ]);
 
                 $event->menu->add([
@@ -202,33 +202,24 @@ class AppServiceProvider extends ServiceProvider
                     'url'  => 'gestor/beneficiarios',
                 ]);
 
-                $event->menu->add([
+               /* $event->menu->add([
                     'text' => 'Evidencias y Documentos',
                     'icon' => 'fas fa-folder-open',
                     'url'  => 'gestor/documentos',
-                ]);
+                ]);*/
 
                 $event->menu->add([
                     'text' => 'Resumen General',
                     'icon' => 'fas fa-chart-bar',
                     'url'  => 'gestor/dashboard',
                 ]);
-                 $event->menu->add([
-                    'text' => 'Resumen General',
-                    'icon' => 'fas fa-chart-bar',
-                    'url'  => 'gestor/dashboard',
-                ]);
-                  $event->menu->add([
-                    'text' => 'Resumen General',
-                    'icon' => 'fas fa-chart-bar',
-                    'url'  => 'gestor/dashboard',
-                ]);
+               
                 
                 
             }
 
             // TOPNAV
-            $notificacionesNoLeidas = \App\Models\NotificacionPersonalizada::where('user_id', $user->_id)
+            $notificacionesNoLeidas = \App\Models\NotificacionPersonalizada::where('user_id', new \MongoDB\BSON\ObjectId($user->_id))
                 ->where('leida', false)
                 ->count();
             $event->menu->add([
@@ -254,7 +245,7 @@ class AppServiceProvider extends ServiceProvider
                 'type'         => 'navbar-item',
                 'text'         => '',
                 'icon'         => 'fas fa-cog',
-                'url'          => 'configuracion',
+                'url'          => $rol === 'admin' ? 'admin/configuracion' : ($rol === 'moderador' ? 'gestor/configuracion' : 'configuracion'),
                 'topnav_right' => true,
             ]);
         });

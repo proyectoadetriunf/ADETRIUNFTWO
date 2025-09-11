@@ -48,7 +48,8 @@
             <input type="text" class="form-control" id="estado" name="estado" value="Pendiente" readonly>
         </div>
 
-        <button type="submit" class="btn btn-success">Enviar Solicitud</button>
+        <button type="submit" class="btn btn-success">📤 Enviar Solicitud</button>
+        <a href="{{ url()->previous() }}" class="btn btn-secondary">↩️ Cancelar</a>
     </form>
 </div>
 @endsection

@@ -52,6 +52,15 @@ class User extends Authenticatable implements JWTSubject
         return $value ? $this->asDateTime($value) : null;
     }
 
+    // Accessor para el avatar
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->photo && file_exists(storage_path('app/public/' . $this->photo))) {
+            return asset('storage/' . $this->photo);
+        }
+        return asset('img/avatar.png');
+    }
+
     /* ==== JWT ==== */
     public function getJWTIdentifier()   { return $this->getKey(); }
     public function getJWTCustomClaims() { return []; }
