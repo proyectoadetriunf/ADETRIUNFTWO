@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
 use Illuminate\Notifications\Notification;
 use App\Models\DatabaseNotification;
+use Illuminate\Support\Facades\URL;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        if (app()->environment('production')) {
+        URL::forceScheme('https');
+    }
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
 
         $this->app['events']->listen(BuildingMenu::class, function (BuildingMenu $event) {
