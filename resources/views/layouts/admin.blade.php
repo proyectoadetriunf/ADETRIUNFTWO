@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- CSRF para formularios/AJAX -->
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>AdminLTE Laravel</title>
 
   <!-- Font Awesome (necesario para que se vean los íconos) -->
