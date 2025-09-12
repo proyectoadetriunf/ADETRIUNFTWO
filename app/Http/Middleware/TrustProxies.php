@@ -29,5 +29,5 @@ class TrustProxies extends Middleware
         Request::HEADER_X_FORWARDED_PROTO |
         Request::HEADER_X_FORWARDED_AWS_ELB |
         Request::HEADER_X_FORWARDED_AWS_ELB;
-        
+
 }

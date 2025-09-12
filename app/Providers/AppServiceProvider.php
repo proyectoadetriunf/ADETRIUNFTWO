@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\Sanctum;
 use App\Models\PersonalAccessToken;
@@ -9,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
 use Illuminate\Notifications\Notification;
 use App\Models\DatabaseNotification;
-use Illuminate\Support\Facades\URL;
+
 
 
 class AppServiceProvider extends ServiceProvider
