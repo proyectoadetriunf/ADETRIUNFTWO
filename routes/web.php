@@ -10,9 +10,11 @@ use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\Admin\ReporteController;
-
+use App\Http\Controllers\Gestor\ComuniController;
 
 use App\Http\Controllers\Admin\UsuarioController;
+Route::get('/comuni', [\App\Http\Controllers\Gestor\ComuniController::class, 'index'])->name('gestor.comuni');
+
 
 Route::resource('usuarios', UsuarioController::class)->names('usuarios');
 
